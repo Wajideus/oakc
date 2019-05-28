@@ -2,7 +2,7 @@
 .PHONY: all clean dist install \
         oakc
 
-OAKCOBJS = parser.o lexer.o syntax.o oakc.o
+OAKCOBJS = syntax.o parser.o lexer.o compiler.o oakc.o
 OAKCLIBS = -ll -ly
 
 all: oakc
