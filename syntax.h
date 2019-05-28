@@ -1,7 +1,42 @@
 #ifndef SYNTAX_H
 #define SYNTAX_H
 
-// Declaration | Expression | Statement
+
+#ifndef offsetof
+#define offsetof(struct_type, field) \
+    ((size_t)&(((struct_type *)NULL)->field))
+#endif
+
+#define as_statement(thing) \
+    ((Statement *)((char *)(thing) - offsetof(Statement, as)))
+
+
+#define create_break_statement(identifier) \
+    add_break_statement(NULL, identifier)
+
+#define create_call_statement() \
+    add_call_statement(NULL)
+
+#define create_continue_statement(identifier) \
+    add_continue_statement(NULL, identifier)
+
+#define create_defer_statement() \
+    add_defer_statement(NULL)
+
+#define create_if_statement(conditions, then_statements) \
+    add_if_statement(NULL, conditions, then_statements)
+
+#define create_return_statement(expressions) \
+    add_return_statement(NULL, expressions)
+
+#define create_set_statement() \
+    add_set_statement(NULL)
+
+#define create_switch_statement() \
+    add_switch_statement(NULL)
+
+#define create_while_statement(conditions, do_statements) \
+    add_while_statement(NULL, conditions, do_statements)
 
 
 typedef enum {
@@ -20,7 +55,7 @@ typedef struct Expression_List_Item {
 
 typedef struct {
     Expression_List_Item *first,
-                              *last;
+                         *last;
 } Expression_List;
 
 typedef enum {
@@ -46,7 +81,7 @@ typedef struct Comparison_List_Item {
 
 typedef struct {
     Comparison_List_Item *first,
-                              *last;
+                         *last;
 } Comparison_List;
 
 // A condition is a list of comparisons
@@ -62,7 +97,7 @@ typedef struct Condition_List_Item {
 
 typedef struct {
     Condition_List_Item *first,
-                             *last;
+                        *last;
 } Condition_List;
 
 
@@ -138,7 +173,7 @@ typedef struct Statement_List_Item {
 
 struct Statement_List {
     Statement_List_Item *first,
-                             *last;
+                        *last;
 };
 
 
@@ -168,26 +203,26 @@ create_statement_list(void);
 
 Break_Statement *
 add_break_statement(Statement_List *statements,
-                         const char *identifier);
+                    const char *identifier);
 
 Call_Statement *
 add_call_statement(Statement_List *statements);
 
 Continue_Statement *
 add_continue_statement(Statement_List *statements,
-                            const char *identifier);
+                       const char *identifier);
 
 Defer_Statement *
 add_defer_statement(Statement_List *statements);
 
 If_Statement *
 add_if_statement(Statement_List *statements,
-                      Condition_List *conditions,
-                      Statement_List *then_statements);
+                 Condition_List *conditions,
+                 Statement_List *then_statements);
 
 Return_Statement *
 add_return_statement(Statement_List *statements,
-                          Expression_List *expressions);
+                     Expression_List *expressions);
 
 Set_Statement *
 add_set_statement(Statement_List *statements);
@@ -197,8 +232,13 @@ add_switch_statement(Statement_List *statements);
 
 While_Statement *
 add_while_statement(Statement_List *statements,
-                         Condition_List *conditions,
-                         Statement_List *do_statements);
+                    Condition_List *conditions,
+                    Statement_List *do_statements);
+
+
+Statement *
+add_statement(Statement_List *statements,
+              Statement *statement);
 
 
 #endif

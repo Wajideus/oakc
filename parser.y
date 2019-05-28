@@ -1,16 +1,20 @@
 %{
 #include <stdio.h>
 
+#include "syntax.h"
+
 extern void yyerror(const char *s);
 extern int yylex();
 extern int yyparse();
 extern FILE *yyin;
 
-extern int line_number;
+extern void compile_statement_list(Statement_List *);
 %}
 
 %union {
     const char *s;
+    Statement_List *statement_list;
+    Statement *statement;
 }
 
 %token DDEFINE DELSE DEND DIF DINCLUDE
@@ -31,6 +35,9 @@ extern int line_number;
 %token LSHEQ RSHEQ ANDEQ OREQ XOREQ 
 %token INC DEC
 %token ETC
+
+%type <statement_list> statement_list
+%type <statement> statement
 
 %%
 
@@ -54,46 +61,111 @@ string_list
 
 statement_list
     : statement_list '\n' statement
+      {
+          add_statement($$, $3);
+      }
     | statement_list ';' statement
+      {
+          add_statement($$, $3);
+      }
     | statement_list '\n'
     | statement_list ';'
     | statement
+      {
+          $$ = create_statement_list();
+          add_statement($$, $1);
+      }
     | '\n'
+      {
+          $$ = create_statement_list();
+      }
     ;
 
 statement
     : BREAK IDENTIFIER
+      {
+          $$ = as_statement(create_break_statement($2));
+      }
     | BREAK
+      {
+          $$ = as_statement(create_break_statement(NULL));
+      }
     | CONTINUE IDENTIFIER
+      {
+          $$ = as_statement(create_continue_statement($2));
+      }
     | CONTINUE
-    | DEFER instruction
+      {
+          $$ = as_statement(create_continue_statement(NULL));
+      }
+    | DEFER call_statement
+      {
+          $$ = as_statement(create_defer_statement());
+      }
     | IF condition_list THEN '\n'
           statement_list
       ELSE '\n'
           statement_list
       END
+      {
+          $$ = as_statement(create_if_statement(NULL, /* conditions */
+                                                $5  /* then_statements */));
+      }
     | IF condition_list THEN '\n'
           statement_list
       ELSE statement
+      {
+          $$ = as_statement(create_if_statement(NULL, /* conditions */
+                                                $5  /* then_statements */));
+      }
     | IF condition_list THEN '\n'
           statement_list
       END
+      {
+          $$ = as_statement(create_if_statement(NULL, /* conditions */
+                                                $5  /* then_statements */));
+      }
     | RETURN expression_list
+      {
+          $$ = as_statement(create_return_statement(NULL /* expressions */));
+      }
     | RETURN
+      {
+          $$ = as_statement(create_return_statement(NULL));
+      }
     | SWITCH expression '\n'
           case_list
           DEFAULT '\n'
               statement_list
       END
+      {
+          $$ = as_statement(create_switch_statement());
+      }
     | SWITCH expression '\n'
           case_list
       END
+      {
+          $$ = as_statement(create_switch_statement());
+      }
     | WHILE condition_list DO '\n'
           statement_list
       END
+      {
+          $$ = as_statement(create_while_statement(NULL, /* conditions*/
+                                                   $5    /* do_statements */));
+      }
     | assignment
+      {
+          $$ = as_statement(create_set_statement());
+      }
     | definition
-    | instruction
+      {
+          $$ = NULL;
+      }
+    | call_statement
+      {
+          $$ = as_statement(create_call_statement());
+      }
     ;
 
 case_list
@@ -149,9 +221,15 @@ definition
     | FUNC IDENTIFIER '(' parameter_list ')' '\n'
           statement_list
       END
+      {
+          compile_statement_list($7);
+      }
     | FUNC IDENTIFIER '(' ')' '\n'
           statement_list
       END
+      {
+          compile_statement_list($6);
+      }
     ;
 
 enum_item_list
@@ -243,7 +321,7 @@ indirection
     |
     ;
 
-instruction
+call_statement
     : IDENTIFIER argument_list
     | IDENTIFIER
     ;

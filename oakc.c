@@ -4,6 +4,7 @@
 #include <string.h>
 #include <unistd.h>
 
+#include "syntax.h"
 #include "parser.h"
 
 extern FILE *yyin;

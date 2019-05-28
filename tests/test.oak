@@ -25,10 +25,19 @@ end
 func main(str args[])
     if numberof(args) < 1 then
         print "not enough arguments!\n"
+        return 1
     else if lengthof(args[0]) == 0 then
         print "argument 0 is empty"
+        break
     else
         print "all is good"
+        continue
+    end
+    while 1 do
+        print stuff
+        say stuff
+        x = 5
+        continue
     end
     return 0
 end

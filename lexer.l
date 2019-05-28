@@ -1,6 +1,7 @@
 %{
 #include <ctype.h>
 
+#include "syntax.h"
 #include "parser.h"
 
 #define update_position() { \
