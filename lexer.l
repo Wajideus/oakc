@@ -10,7 +10,7 @@ STRING \"(\\.|[^\\"])*\"
 
 \/\/.*  ;
 [ \t]   ;
-\n      return NEWLINE;
+\n      return '\n';
 \#[ \t]*define   return DDEFINE;
 \#[ \t]*else     return DELSE;
 \#[ \t]*end      return DEND;

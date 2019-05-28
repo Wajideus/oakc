@@ -29,35 +29,34 @@ extern FILE *yyin;
 %token LSHEQ RSHEQ ANDEQ OREQ XOREQ 
 %token INC DEC
 %token ETC
-%token NEWLINE
 
 %%
 
 file
-    : file NEWLINE definition
-    | file NEWLINE directive
-    | file NEWLINE
+    : file '\n' definition
+    | file '\n' directive
+    | file '\n'
     | definition
     | directive
     |
     ;
 
 directive
-    : DINCLUDE strings
+    : DINCLUDE string_list
     ;
 
-strings
-    : strings ',' STRING
+string_list
+    : string_list ',' STRING
     | STRING
     ;
 
-statements
-    : statements NEWLINE statement
-    | statements ';' statement
-    | statements NEWLINE
-    | statements ';'
+statement_list
+    : statement_list '\n' statement
+    | statement_list ';' statement
+    | statement_list '\n'
+    | statement_list ';'
     | statement
-    | NEWLINE
+    | '\n'
     ;
 
 statement
@@ -66,31 +65,47 @@ statement
     | CONTINUE IDENTIFIER
     | CONTINUE
     | DEFER instruction
-    | IF conditions THEN NEWLINE statements ELSE NEWLINE statements END
-    | IF conditions THEN NEWLINE statements ELSE statement
-    | IF conditions THEN NEWLINE statements END
-    | RETURN expressions
+    | IF condition_list THEN '\n'
+          statement_list
+      ELSE '\n'
+          statement_list
+      END
+    | IF condition_list THEN '\n'
+          statement_list
+      ELSE statement
+    | IF condition_list THEN '\n'
+          statement_list
+      END
+    | RETURN expression_list
     | RETURN
-    | SWITCH expression NEWLINE cases DEFAULT NEWLINE statements END
-    | SWITCH expression NEWLINE cases END
-    | WHILE conditions DO NEWLINE statements END
+    | SWITCH expression '\n'
+          case_list
+          DEFAULT '\n'
+              statement_list
+      END
+    | SWITCH expression '\n'
+          case_list
+      END
+    | WHILE condition_list DO '\n'
+          statement_list
+      END
     | assignment
     | definition
     | instruction
     ;
 
-cases
-    : cases case
+case_list
+    : case_list case
     | case
     ;
 
 case
-    : CASE expression NEWLINE statements
-    | CASE expression NEWLINE
+    : CASE expression '\n' statement_list
+    | CASE expression '\n'
     ;
 
 assignment
-    : references '=' expressions
+    : reference_list '=' expression_list
     | reference ADDEQ expression
     | reference SUBEQ expression
     | reference MULEQ expression
@@ -105,8 +120,8 @@ assignment
     | reference DEC
     ;
 
-references
-    : references ',' reference
+reference_list
+    : reference_list ',' reference
     | reference
     ;
 
@@ -119,60 +134,78 @@ reference
     ;
 
 definition
-    : TYPEDEF ENUM IDENTIFIER NEWLINE enumCases END
-    | TYPEDEF FUNC IDENTIFIER '(' parameters ')'
+    : TYPEDEF ENUM IDENTIFIER '\n'
+          enum_item_list
+      END
+    | TYPEDEF FUNC IDENTIFIER '(' parameter_list ')'
     | TYPEDEF FUNC IDENTIFIER '(' ')'
-    | TYPEDEF STRUCT IDENTIFIER NEWLINE structFields END
-    | EXTERN FUNC IDENTIFIER '(' parameters ')'
+    | TYPEDEF STRUCT IDENTIFIER '\n'
+          struct_item_list
+      END
+    | EXTERN FUNC IDENTIFIER '(' parameter_list ')'
     | EXTERN FUNC IDENTIFIER '(' ')'
-    | FUNC IDENTIFIER '(' parameters ')' NEWLINE statements END
-    | FUNC IDENTIFIER '(' ')' NEWLINE statements END
+    | FUNC IDENTIFIER '(' parameter_list ')' '\n'
+          statement_list
+      END
+    | FUNC IDENTIFIER '(' ')' '\n'
+          statement_list
+      END
     ;
 
-enumCases
-    : enumCases NEWLINE enumCase
-    | enumCases ',' enumCase
-    | enumCases NEWLINE
-    | enumCases ','
-    | enumCase
-    | NEWLINE
+enum_item_list
+    : enum_item_list '\n' enum_item
+    | enum_item_list ',' enum_item
+    | enum_item_list '\n'
+    | enum_item_list ','
+    | enum_item
+    | '\n'
     ;
 
-enumCase
+enum_item
     : IDENTIFIER '=' expression
     | IDENTIFIER
     ;
 
-structFields
-    : structFields NEWLINE structField
-    | structFields ';' structField
-    | structFields NEWLINE
-    | structFields ';'
-    | structField
-    | NEWLINE
+struct_item_list
+    : struct_item_list '\n' struct_item
+    | struct_item_list ';' struct_item
+    | struct_item_list '\n'
+    | struct_item_list ';'
+    | struct_item
+    | '\n'
     ;
 
-structField
-    : MIXIN typeName indirection IDENTIFIER '=' expression
-    | MIXIN typeName indirection IDENTIFIER
-    | MIXIN STRUCT NEWLINE structFields END
-    | ENUM IDENTIFIER NEWLINE enumCases END
-    | ENUM NEWLINE enumCases END
-    | STRUCT IDENTIFIER NEWLINE structFields END
-    | STRUCT NEWLINE structFields END
-    | typeName declarators
+struct_item
+    : MIXIN type_name indirection IDENTIFIER '=' expression
+    | MIXIN type_name indirection IDENTIFIER
+    | MIXIN STRUCT '\n'
+          struct_item_list
+      END
+    | ENUM IDENTIFIER '\n'
+          enum_item_list
+      END
+    | ENUM '\n'
+          enum_item_list
+      END
+    | STRUCT IDENTIFIER '\n'
+          struct_item_list
+      END
+    | STRUCT '\n'
+          struct_item_list
+      END
+    | type_name declarator_list
     ;
 
-parameters
-    : parameters ',' parameter
+parameter_list
+    : parameter_list ',' parameter
     | parameter
     ;
 
 parameter
-    : typeName declarator
+    : type_name declarator
     ;
 
-typeName
+type_name
     : IDENTIFIER
     | BOOL
     | CHAR
@@ -183,8 +216,8 @@ typeName
     | VOID
     ;
 
-declarators
-    : declarators ',' declarator
+declarator_list
+    : declarator_list ',' declarator
     | declarator
     ;
 
@@ -196,7 +229,7 @@ declarator
 name
     : indirection '(' '*' IDENTIFIER ')' '[' expression ']'
     | indirection '(' '*' IDENTIFIER ')' '[' ']'
-    | indirection '(' '*' IDENTIFIER ')' '(' parameters ')'
+    | indirection '(' '*' IDENTIFIER ')' '(' parameter_list ')'
     | indirection '(' '*' IDENTIFIER ')' '(' ')'
     | indirection IDENTIFIER
     | name '[' expression ']'
@@ -209,12 +242,12 @@ indirection
     ;
 
 instruction
-    : IDENTIFIER arguments
+    : IDENTIFIER argument_list
     | IDENTIFIER
     ;
 
-arguments
-    : arguments ',' argument
+argument_list
+    : argument_list ',' argument
     | argument
     ;
 
@@ -224,8 +257,8 @@ argument
     | ETC
     ;
 
-conditions
-    : conditions OR condition
+condition_list
+    : condition_list OR condition
     | condition
     ;
 
@@ -235,17 +268,17 @@ condition
     ;
 
 comparison
-    : comparison EQ expressions
-    | comparison NEQ expressions
-    | comparison '<' expressions
-    | comparison '>' expressions
-    | comparison LTEQ expressions
-    | comparison GTEQ expressions
-    | expressions
+    : comparison EQ expression_list
+    | comparison NEQ expression_list
+    | comparison '<' expression_list
+    | comparison '>' expression_list
+    | comparison LTEQ expression_list
+    | comparison GTEQ expression_list
+    | expression_list
     ;
 
-expressions
-    : expressions ',' expression
+expression_list
+    : expression_list ',' expression
     | expression
     ;
 
@@ -273,10 +306,10 @@ value
     : LENGTHOF '(' reference ')'
     | NUMBEROF '(' reference ')'
     | SIZEOF '(' reference ')'
-    | value '(' arguments ')'
+    | value '(' argument_list ')'
     | value '[' expression ']'
     | value '.' IDENTIFIER
-    | '(' conditions ')'
+    | '(' condition_list ')'
     | IDENTIFIER
     | NUMBER
     | STRING
