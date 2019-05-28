@@ -5,6 +5,8 @@ extern void yyerror(const char *s);
 extern int yylex();
 extern int yyparse();
 extern FILE *yyin;
+
+extern int line_number;
 %}
 
 %union {
