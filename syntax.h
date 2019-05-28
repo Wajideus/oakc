@@ -142,8 +142,6 @@ struct Statement_List {
 };
 
 
-// Building Functions (Contained in "builder.c")
-
 Expression_List *
 create_expression_list(void);
 
@@ -166,7 +164,7 @@ add_condition(Condition_List *conditions);
 
 
 Statement_List *
-    create_statement_list(void);
+create_statement_list(void);
 
 Break_Statement *
 add_break_statement(Statement_List *statements,
@@ -201,24 +199,6 @@ While_Statement *
 add_while_statement(Statement_List *statements,
                          Condition_List *conditions,
                          Statement_List *do_statements);
-
-
-// Printing Functions (Contained in "printer.c")
-
-void print_condition_list(Condition_List *conditions);
-void print_condition(Condition *condition);
-
-void print_break_statement(Break_Statement *statement);
-void print_call_statement(Call_Statement *statement);
-void print_continue_statement(Continue_Statement *statement);
-void print_defer_statement(Defer_Statement *statement);
-void print_if_statement(If_Statement *statement);
-void print_return_statement(Return_Statement *statement);
-void print_set_statement(Set_Statement *statement);
-void print_switch_statement(Switch_Statement *statement);
-void print_while_statement(While_Statement *statement);
-void print_statement(Statement *statement);
-void print_statement_list(Statement_List *statements);
 
 
 #endif

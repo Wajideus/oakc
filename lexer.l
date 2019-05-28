@@ -46,7 +46,7 @@ case      { update_position(); return CASE; }
 char      { update_position(); return CHAR; }
 continue  { update_position(); return CONTINUE; }
 default   { update_position(); return DEFAULT; }
-defer     { update_position();  return DEFER; }
+defer     { update_position(); return DEFER; }
 do        { update_position(); return DO; }
 else      { update_position(); return ELSE; }
 end       { update_position(); return END; }

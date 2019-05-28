@@ -3,113 +3,93 @@
 #include "syntax.h"
 
 
-void print_condition_list(Condition_List *conditions) {
-    Condition_List_Item *item = conditions->first;
-    do {
-        print_condition(&item->condition);
-        item = item->next;
-        if (item) {
-            printf(" || ");
-        }
-    }
-    while (item);
+Expression_List *
+create_expression_list(void) {
+    return NULL;
 }
 
-void print_condition(Condition *condition) {
-    printf("_");
+Expression *
+add_expression(Expression_List *expressions) {
+    return NULL;
 }
 
-void print_break_statement(Break_Statement *statement) {
-    printf("break");
-    if (statement->identifier) {
-        printf(" %s", statement->identifier);
-    }
+
+Comparison_List *
+create_comparison_list(void) {
+    return NULL;
 }
 
-void print_call_statement(Call_Statement *statement) {
+Comparison *
+add_comparison(Comparison_List *comparisons) {
+    return NULL;
 }
 
-void print_continue_statement(Continue_Statement *statement) {
-    printf("continue");
-    if (statement->identifier) {
-        printf(" %s", statement->identifier);
-    }
+
+Condition_List *
+create_condition_list(void) {
+    return NULL;
 }
 
-void print_defer_statement(Defer_Statement *statement) {
-    printf("defer ");
-    print_call_statement(statement->call_statement);
+Condition *
+add_condition(Condition_List *conditions) {
+    return NULL;
 }
 
-void print_if_statement(If_Statement *statement) {
-    printf("if ");
-    print_condition_list(statement->conditions);
-    printf(" then\n");
-    print_statement_list(statement->then_statements);
-    printf("\nend");
+
+Statement_List *
+create_statement_list(void) {
+    return NULL;
 }
 
-void print_return_statement(Return_Statement *statement) {
-    printf("return");
-    if (statement->expressions) {
-        // print_expression_list();
-    }
+Break_Statement *
+add_break_statement(Statement_List *statements,
+                         const char *identifier) {
+    return NULL;
 }
 
-void print_set_statement(Set_Statement *statement) {
+Call_Statement *
+add_call_statement(Statement_List *statements) {
+    return NULL;
 }
 
-void print_switch_statement(Switch_Statement *statement) {
+Continue_Statement *
+add_continue_statement(Statement_List *statements,
+                            const char *identifier) {
+    return NULL;
 }
 
-void print_while_statement(While_Statement *statement) {
-    printf("while ");
-    print_condition_list(statement->conditions);
-    printf(" do\n");
-    print_statement_list(statement->do_statements);
-    printf("\nend");
+Defer_Statement *
+add_defer_statement(Statement_List *statements) {
+    return NULL;
 }
 
-void print_statement_list(Statement_List *statements) {
-    Statement_List_Item *item = statements->first;
-    do {
-        print_statement(&item->statement);
-        item = item->next;
-        if (item) {
-            printf("\n");
-        }
-    }
-    while (item);
+If_Statement *
+add_if_statement(Statement_List *statements,
+                      Condition_List *conditions,
+                      Statement_List *then_statements) {
+    return NULL;
 }
 
-void print_statement(Statement *statement) {
-    switch (statement->type) {
-        case BREAK_STATEMENT:
-            print_break_statement((void *)statement);
-            break;
-        case CALL_STATEMENT:
-            print_call_statement((void *)statement);
-            break;
-        case CONTINUE_STATEMENT:
-            print_continue_statement((void *)statement);
-            break;
-        case DEFER_STATEMENT:
-            print_defer_statement((void *)statement);
-            break;
-        case IF_STATEMENT:
-            print_if_statement((void *)statement);
-            break;
-        case RETURN_STATEMENT:
-            print_return_statement((void *)statement);
-            break;
-        case SET_STATEMENT:
-            print_set_statement((void *)statement);
-            break;
-        case SWITCH_STATEMENT:
-            print_switch_statement((void *)statement);
-            break;
-        case WHILE_STATEMENT:
-            print_while_statement((void *)statement);
-            break;
-    }
+Return_Statement *
+add_return_statement(Statement_List *statements,
+                          Expression_List *expressions) {
+    return NULL;
 }
+
+Set_Statement *
+add_set_statement(Statement_List *statements) {
+    return NULL;
+}
+
+Switch_Statement *
+add_switch_statement(Statement_List *statements) {
+    return NULL;
+}
+
+While_Statement *
+add_while_statement(Statement_List *statements,
+                         Condition_List *conditions,
+                         Statement_List *do_statements) {
+    return NULL;
+}
+
