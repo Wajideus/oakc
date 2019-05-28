@@ -1,0 +1,4 @@
+*.o
+oakc
+parser.h
+y.output

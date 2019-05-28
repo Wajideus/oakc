@@ -1,0 +1,34 @@
+#include "stdio", "stdlib"
+
+typedef enum status
+    DEAD = 1 << 2
+    BURNED, FROZEN
+end
+
+typedef struct Entity
+    mixin Transform transform
+    Component (*components)[]      // pointer to an array of Component
+end
+
+typedef struct Door
+    mixin Entity entity
+    float openness
+end
+
+
+
+// sizeof("test") == sizeof(size_t) + sizeof(char) * (lengthof("test") + 1)
+// sizeof(int[3]) == sizeof(size_t) + sizeof(int) * 3
+
+// placement new:                   components := (mem) new str("test")
+
+func main(str args[])
+    if numberof(args) < 1 then
+        print "not enough arguments!\n"
+    else if lengthof(args[0]) == 0 then
+        print "argument 0 is empty"
+    else
+        print "all is good"
+    end
+    return 0
+end
