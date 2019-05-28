@@ -33,10 +33,10 @@ extern FILE *yyin;
 
 %%
 
-oaky
-    : oaky NEWLINE definition
-    | oaky NEWLINE directive
-    | oaky NEWLINE
+file
+    : file NEWLINE definition
+    | file NEWLINE directive
+    | file NEWLINE
     | definition
     | directive
     |

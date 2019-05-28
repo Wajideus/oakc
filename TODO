@@ -1,0 +1,9 @@
+- The printing functions in syntax.c/syntax.h will eventually be removed. They
+  only exist for testing purposes to ensure that the syntax tree is being
+  formatted properly, and to test how a code generator should decend the tree.
+
+- The AST building functions need to be implemented and used by parser.y.
+
+- Error logging functionality needs to be added to the parser.
+
+- An LLVM emitter needs to be written.
