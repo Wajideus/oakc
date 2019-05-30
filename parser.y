@@ -26,7 +26,7 @@ extern void compile_statement_list(Statement_List *);
 %token DDEFINE DELSE DEND DIF DINCLUDE
 %token CASE DEFAULT DEFER DO ELSE IF SWITCH THEN WHILE
 %token BREAK CONTINUE END RETURN
-%token ENUM FUNC STRUCT TYPEDEF UNION
+%token CONST ENUM FUNC STRUCT TYPEDEF UNION VAR
 %token BOOL CHAR FLOAT INT STR UINT VOID
 %token EXTERN FIXTO OF MIXIN VIA
 %token <s> IDENTIFIER TYPENAME
@@ -58,6 +58,11 @@ file
     | file '\n'
     | definition
     | directive
+    |
+    ;
+
+optional_whitespace
+    : optional_whitespace '\n'
     |
     ;
 
@@ -171,7 +176,7 @@ statement
       }
     | definition
       {
-          $$ = NULL;
+          $$ = as_statement(create_define_statement());
       }
     | call_statement
       {
@@ -241,6 +246,19 @@ definition
       {
           compile_statement_list($6);
       }
+    | CONST type_name declarator_list
+    | CONST initializer_list
+    | VAR type_name declarator_list
+    | VAR initializer_list
+    ;
+
+initializer_list
+    : initializer_list ',' optional_whitespace initializer
+    | initializer
+    ;
+
+initializer
+    : IDENTIFIER '=' expression
     ;
 
 enum_item_list
@@ -310,12 +328,12 @@ type_name
     ;
 
 declarator_list
-    : declarator_list ',' declarator
+    : declarator_list ',' optional_whitespace declarator
     | declarator
     ;
 
 declarator
-    : name '=' expression
+    : name '=' optional_whitespace expression
     | name
     ;
 
@@ -340,7 +358,7 @@ call_statement
     ;
 
 argument_list
-    : argument_list ',' argument
+    : argument_list ',' optional_whitespace argument
     | argument
     ;
 
@@ -351,9 +369,9 @@ argument
     ;
 
 condition_list
-    : condition_list OR condition
+    : condition_list optional_whitespace OR optional_whitespace condition
       {
-          add_condition_to_list($3, $$);
+          add_condition_to_list($5, $$);
       }
     | condition
       {
@@ -370,9 +388,9 @@ condition
     ;
 
 comparison_list
-    : comparison_list AND comparison
+    : comparison_list AND optional_whitespace comparison
       {
-          add_comparison_to_list($3, $$);
+          add_comparison_to_list($4, $$);
       }
     | comparison
       {
@@ -382,29 +400,29 @@ comparison_list
     ;
 
 comparison
-    : expression_list EQ expression_list
+    : expression_list EQ optional_whitespace expression_list
       {
-          $$ = create_comparison(EQUAL_COMPARISON, $1, $3);
+          $$ = create_comparison(EQUAL_COMPARISON, $1, $4);
       }
-    | expression_list NEQ expression_list
+    | expression_list NEQ optional_whitespace expression_list
       {
-          $$ = create_comparison(NOT_EQUAL_COMPARISON, $1, $3);
+          $$ = create_comparison(NOT_EQUAL_COMPARISON, $1, $4);
       }
-    | expression_list '<' expression_list
+    | expression_list '<' optional_whitespace expression_list
       {
-          $$ = create_comparison(LESS_THAN_COMPARISON, $1, $3);
+          $$ = create_comparison(LESS_THAN_COMPARISON, $1, $4);
       }
-    | expression_list '>' expression_list
+    | expression_list '>' optional_whitespace expression_list
       {
-          $$ = create_comparison(GREATER_THAN_COMPARISON, $1, $3);
+          $$ = create_comparison(GREATER_THAN_COMPARISON, $1, $4);
       }
-    | expression_list LTEQ expression_list
+    | expression_list LTEQ optional_whitespace expression_list
       {
-          $$ = create_comparison(LESS_THAN_EQUAL_COMPARISON, $1, $3);
+          $$ = create_comparison(LESS_THAN_EQUAL_COMPARISON, $1, $4);
       }
-    | expression_list GTEQ expression_list
+    | expression_list GTEQ optional_whitespace expression_list
       {
-          $$ = create_comparison(GREATER_THAN_EQUAL_COMPARISON, NULL, $3);
+          $$ = create_comparison(GREATER_THAN_EQUAL_COMPARISON, NULL, $4);
       }
     | expression_list
       {
@@ -413,7 +431,7 @@ comparison
     ;
 
 expression_list
-    : expression_list ',' expression
+    : expression_list ',' optional_whitespace expression
       {
           add_expression_to_list(create_expression(), $$);
       }
@@ -425,20 +443,20 @@ expression_list
     ;
 
 expression
-    : expression '+' term
-    | expression '-' term
-    | expression '|' term
-    | expression '^' term
+    : expression '+' optional_whitespace term
+    | expression '-' optional_whitespace term
+    | expression '|' optional_whitespace term
+    | expression '^' optional_whitespace term
     | term
     ;
 
 term
-    : term '*' value
-    | term '/' value
-    | term '%' value
-    | term '&' value
-    | term LSH value
-    | term RSH value
+    : term '*' optional_whitespace value
+    | term '/' optional_whitespace value
+    | term '%' optional_whitespace value
+    | term '&' optional_whitespace value
+    | term LSH optional_whitespace value
+    | term RSH optional_whitespace value
     | value
     ;
 

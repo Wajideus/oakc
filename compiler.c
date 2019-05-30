@@ -131,6 +131,13 @@ static void compile_defer_statement(Defer_Statement *statement) {
     }
 }
 
+static void compile_define_statement(Define_Statement *statement) {
+    if (statement) {
+        indent();
+        printf("[define]");
+    }
+}
+
 static void compile_if_statement(If_Statement *statement) {
     if (statement) {
         indent();
@@ -197,6 +204,9 @@ static void compile_statement(Statement *statement) {
                 break;
             case DEFER_STATEMENT:
                 compile_defer_statement(&statement->as.defer_statement);
+                break;
+            case DEFINE_STATEMENT:
+                compile_define_statement(&statement->as.define_statement);
                 break;
             case IF_STATEMENT:
                 compile_if_statement(&statement->as.if_statement);

@@ -53,7 +53,7 @@ create_expression(void) {
     Expression_List_Item *item = malloc(sizeof(Expression_List_Item));
     if (item) {
         item->next = NULL;
-        item->expression.type = ADDITION_EXPRESSION;
+        item->expression.terms = NULL;
         return &item->expression;
     }
     else {
@@ -175,6 +175,19 @@ create_defer_statement(void) {
         item->next = NULL;
         item->statement.type = DEFER_STATEMENT;
         return &item->statement.as.defer_statement;
+    }
+    else {
+        return NULL;
+    }
+}
+
+Define_Statement *
+create_define_statement(void) {
+    Statement_List_Item *item = malloc(sizeof(Statement_List_Item));
+    if (item) {
+        item->next = NULL;
+        item->statement.type = DEFINE_STATEMENT;
+        return &item->statement.as.define_statement;
     }
     else {
         return NULL;
