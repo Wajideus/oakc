@@ -22,8 +22,14 @@ end
 
 // placement new:                   components := (mem) new str("test")
 
+
+
+
+
+
+
 func main(str args[])
-    if 3, numberof(args) < 1 && sizeof(args[1]) == 2 then
+    if numberof(args) < 1 && sizeof(args[1]) == 2 then
         print "not enough arguments!\n"
         return 1
     else if lengthof(args[0]) == 0 then

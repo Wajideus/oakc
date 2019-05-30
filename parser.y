@@ -380,33 +380,33 @@ comparison_list
     ;
 
 comparison
-    : comparison EQ expression_list
+    : expression_list EQ expression_list
       {
-          $$ = create_comparison(EQUAL_COMPARISON, NULL, NULL);
+          $$ = create_comparison(EQUAL_COMPARISON, $1, $3);
       }
-    | comparison NEQ expression_list
+    | expression_list NEQ expression_list
       {
-          $$ = create_comparison(NOT_EQUAL_COMPARISON, NULL, NULL);
+          $$ = create_comparison(NOT_EQUAL_COMPARISON, $1, $3);
       }
-    | comparison '<' expression_list
+    | expression_list '<' expression_list
       {
-          $$ = create_comparison(LESS_THAN_COMPARISON, NULL, NULL);
+          $$ = create_comparison(LESS_THAN_COMPARISON, $1, $3);
       }
-    | comparison '>' expression_list
+    | expression_list '>' expression_list
       {
-          $$ = create_comparison(GREATER_THAN_COMPARISON, NULL, NULL);
+          $$ = create_comparison(GREATER_THAN_COMPARISON, $1, $3);
       }
-    | comparison LTEQ expression_list
+    | expression_list LTEQ expression_list
       {
-          $$ = create_comparison(LESS_THAN_EQUAL_COMPARISON, NULL, NULL);
+          $$ = create_comparison(LESS_THAN_EQUAL_COMPARISON, $1, $3);
       }
-    | comparison GTEQ expression_list
+    | expression_list GTEQ expression_list
       {
-          $$ = create_comparison(GREATER_THAN_EQUAL_COMPARISON, NULL, NULL);
+          $$ = create_comparison(GREATER_THAN_EQUAL_COMPARISON, NULL, $3);
       }
     | expression_list
       {
-          $$ = create_comparison(EQUAL_COMPARISON, NULL, NULL);
+          $$ = create_comparison(NO_COMPARISON, $1, NULL);
       }
     ;
 

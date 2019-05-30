@@ -53,6 +53,7 @@ create_expression(void) {
     Expression_List_Item *item = malloc(sizeof(Expression_List_Item));
     if (item) {
         item->next = NULL;
+        item->expression.type = ADDITION_EXPRESSION;
         return &item->expression;
     }
     else {

@@ -15,9 +15,52 @@ static void indent(void) {
     }
 }
 
+static void compile_expression(Expression *expression) {
+    printf("<expression>");
+}
+
+static void compile_expression_list(Expression_List *list) {
+    if (list) {
+        Expression_List_Item *item = list->first;
+        while (item) {
+            compile_expression(&item->expression);
+            item = item->next;
+            if (item) {
+                printf(", ");
+            }
+        }
+    }
+}
+
 static void compile_comparison(Comparison *comparison) {
     if (comparison) {
-        printf("<comparison>");
+        compile_expression_list(comparison->left_expressions);
+        switch (comparison->type) {
+            case EQUAL_COMPARISON:
+                printf(" == ");
+                compile_expression_list(comparison->right_expressions);
+                break;
+            case NOT_EQUAL_COMPARISON:
+                printf(" != ");
+                compile_expression_list(comparison->right_expressions);
+                break;
+            case LESS_THAN_COMPARISON:
+                printf(" < ");
+                compile_expression_list(comparison->right_expressions);
+                break;
+            case GREATER_THAN_COMPARISON:
+                printf(" > ");
+                compile_expression_list(comparison->right_expressions);
+                break;
+            case LESS_THAN_EQUAL_COMPARISON:
+                printf(" <= ");
+                compile_expression_list(comparison->right_expressions);
+                break;
+            case GREATER_THAN_EQUAL_COMPARISON:
+                printf(" >= ");
+                compile_expression_list(comparison->right_expressions);
+                break;
+        }
     }
 }
 

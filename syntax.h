@@ -12,15 +12,39 @@
     ((Statement *)((char *)(thing) - offsetof(Statement, as)))
 
 
-typedef enum {
-    PRODUCT_EXPRESSION
-} Expression_Type;
+typedef struct Condition Condition;
 
 typedef struct {
-    Expression_Type type;
+} Value;
+
+typedef struct {
+    // * / % & << >>
+    Value *value;
+} Value_List_Item;
+
+typedef struct {
+    Value_List_Item *first,
+                    *last;
+} Value_List;
+
+typedef struct {
+    Value_List values;
+} Term;
+
+typedef struct {
+    // + - | ^
+    Term term;
+} Term_List_Item;
+
+typedef struct {
+    Term_List_Item *first,
+                   *last;
+} Term_List;
+
+typedef struct Expression {
+    Term_List *terms;
 } Expression;
 
-// Items in an expression list are combined with ','
 typedef struct Expression_List_Item {
     struct Expression_List_Item *next;
     Expression expression;
@@ -32,12 +56,13 @@ typedef struct {
 } Expression_List;
 
 typedef enum {
-    EQUAL_COMPARISON,              // ==
-    NOT_EQUAL_COMPARISON,          // !=
-    LESS_THAN_COMPARISON,          // <
-    GREATER_THAN_COMPARISON,       // >
-    LESS_THAN_EQUAL_COMPARISON,    // <=
-    GREATER_THAN_EQUAL_COMPARISON  // >=
+    NO_COMPARISON,
+    EQUAL_COMPARISON,
+    NOT_EQUAL_COMPARISON,
+    LESS_THAN_COMPARISON,
+    GREATER_THAN_COMPARISON,
+    LESS_THAN_EQUAL_COMPARISON,
+    GREATER_THAN_EQUAL_COMPARISON
 } Comparison_Type;
 
 typedef struct {
@@ -46,7 +71,6 @@ typedef struct {
     Expression_List *right_expressions;
 } Comparison;
 
-// Items in a comparison list are combined with '&&'
 typedef struct Comparison_List_Item {
     struct Comparison_List_Item *next;
     Comparison comparison;
@@ -57,12 +81,10 @@ typedef struct {
                          *last;
 } Comparison_List;
 
-// A condition is a list of comparisons
-typedef struct {
+struct Condition {
     Comparison_List *comparisons;
-} Condition;
+};
 
-// Items in a condition list are combined with '||'
 typedef struct Condition_List_Item {
     struct Condition_List_Item *next;
     Condition condition;
@@ -138,7 +160,6 @@ typedef struct {
     } as;
 } Statement;
 
-// Items in a statement list are separated by '\n' or ';'
 typedef struct Statement_List_Item {
     struct Statement_List_Item *next;
     Statement statement;
