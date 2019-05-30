@@ -54,6 +54,7 @@ end       { update_position(); return END; }
 enum      { update_position(); return ENUM; }
 extern    { update_position(); return EXTERN; }
 float     { update_position(); return FLOAT; }
+fixto     { update_position(); return FIXTO; }
 func      { update_position(); return FUNC; }
 if        { update_position(); return IF; }
 int       { update_position(); return INT; }
@@ -69,6 +70,7 @@ switch    { update_position(); return SWITCH; }
 then      { update_position(); return THEN; }
 typedef   { update_position(); return TYPEDEF; }
 uint      { update_position(); return UINT; }
+via       { update_position(); return VIA; }
 void      { update_position(); return VOID; }
 while     { update_position(); return WHILE; }
 {IDENTIFIER}  { update_position(); return IDENTIFIER; }  // todo: check if type or identifier

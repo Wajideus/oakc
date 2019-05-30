@@ -28,7 +28,7 @@ extern void compile_statement_list(Statement_List *);
 %token BREAK CONTINUE END RETURN
 %token ENUM FUNC STRUCT TYPEDEF UNION
 %token BOOL CHAR FLOAT INT STR UINT VOID
-%token EXTERN OF MIXIN
+%token EXTERN FIXTO OF MIXIN VIA
 %token <s> IDENTIFIER TYPENAME
 %token NUMBER
 %token STRING
@@ -269,9 +269,11 @@ struct_item_list
 struct_item
     : MIXIN type_name indirection IDENTIFIER '=' expression
     | MIXIN type_name indirection IDENTIFIER
+    | MIXIN FIXTO reference VIA type_name IDENTIFIER
     | MIXIN STRUCT OF '\n'
           struct_item_list
       END
+    | FIXTO reference VIA type_name IDENTIFIER
     | ENUM IDENTIFIER OF '\n'
           enum_item_list
       END

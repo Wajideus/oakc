@@ -1,6 +1,11 @@
 #include "stdio", "stdlib"
 
 
+typedef struct ActorInstance of
+    mixin fixto actors via int actor
+end
+
+
 typedef enum Status of
     DEAD = 1 << 2
     BURNED, FROZEN
