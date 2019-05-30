@@ -1,16 +1,17 @@
 #include "stdio", "stdlib"
 
-typedef enum status
+
+typedef enum Status of
     DEAD = 1 << 2
     BURNED, FROZEN
 end
 
-typedef struct Entity
-    mixin Transform transform
+typedef struct Entity of
     Component (*components)[]      // pointer to an array of Component
+    Status status
 end
 
-typedef struct Door
+typedef struct Door of
     mixin Entity entity
     float openness
 end
@@ -23,10 +24,10 @@ end
 // placement new:                   components := (mem) new str("test")
 
 func main(str args[])
-    if 3, numberof(args) < 1 && sizeof(args[1]) == 2 then
+    if 3, num(args) < 1, 2 && sizeof(args[1]) == 2 then
         print "not enough arguments!\n"
         return 1
-    else if lengthof(args[0]) == 0 then
+    else if len(args[0]) == 0 then
         print "argument 0 is empty"
         break
     else
@@ -39,5 +40,6 @@ func main(str args[])
         x = 5
         continue
     end
+    move player, toLocation = (0, 0, 0)
     return 0
 end

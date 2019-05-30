@@ -57,9 +57,10 @@ float     { update_position(); return FLOAT; }
 func      { update_position(); return FUNC; }
 if        { update_position(); return IF; }
 int       { update_position(); return INT; }
-lengthof  { update_position(); return LENGTHOF; }
+len       { update_position(); return LEN; }
 mixin     { update_position(); return MIXIN; }
-numberof  { update_position(); return NUMBEROF; }
+num       { update_position(); return NUM; }
+of        { update_position(); return OF; }
 return    { update_position(); return RETURN; }
 sizeof    { update_position(); return SIZEOF; }
 str       { update_position(); return STR; }

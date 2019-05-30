@@ -16,7 +16,7 @@ static void indent(void) {
 }
 
 static void compile_expression(Expression *expression) {
-    printf("<expression>");
+    printf("[expr]");
 }
 
 static void compile_expression_list(Expression_List *list) {
@@ -109,7 +109,7 @@ static void compile_break_statement(Break_Statement *statement) {
 static void compile_call_statement(Call_Statement *statement) {
     if (statement) {
         indent();
-        printf("<call>");
+        printf("[call]");
     }
 }
 
@@ -158,14 +158,14 @@ static void compile_return_statement(Return_Statement *statement) {
 static void compile_set_statement(Set_Statement *statement) {
     if (statement) {
         indent();
-        printf("<set>");
+        printf("[set]");
     }
 }
 
 static void compile_switch_statement(Switch_Statement *statement) {
     if (statement) {
         indent();
-        printf("<switch>");
+        printf("[switch]");
     }
 }
 

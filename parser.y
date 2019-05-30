@@ -28,12 +28,12 @@ extern void compile_statement_list(Statement_List *);
 %token BREAK CONTINUE END RETURN
 %token ENUM FUNC STRUCT TYPEDEF UNION
 %token BOOL CHAR FLOAT INT STR UINT VOID
-%token EXTERN MIXIN TYPENAME
-%token <s> IDENTIFIER
+%token EXTERN OF MIXIN
+%token <s> IDENTIFIER TYPENAME
 %token NUMBER
 %token STRING
 %token KFALSE KNULL KTRUE
-%token LENGTHOF NUMBEROF SIZEOF
+%token LEN NUM SIZEOF
 %token LSH RSH
 %token LTEQ GTEQ EQ NEQ
 %token AND OR
@@ -219,12 +219,12 @@ reference
     ;
 
 definition
-    : TYPEDEF ENUM IDENTIFIER '\n'
+    : TYPEDEF ENUM IDENTIFIER OF '\n'
           enum_item_list
       END
     | TYPEDEF FUNC IDENTIFIER '(' parameter_list ')'
     | TYPEDEF FUNC IDENTIFIER '(' ')'
-    | TYPEDEF STRUCT IDENTIFIER '\n'
+    | TYPEDEF STRUCT IDENTIFIER OF '\n'
           struct_item_list
       END
     | EXTERN FUNC IDENTIFIER '(' parameter_list ')'
@@ -269,19 +269,19 @@ struct_item_list
 struct_item
     : MIXIN type_name indirection IDENTIFIER '=' expression
     | MIXIN type_name indirection IDENTIFIER
-    | MIXIN STRUCT '\n'
+    | MIXIN STRUCT OF '\n'
           struct_item_list
       END
-    | ENUM IDENTIFIER '\n'
+    | ENUM IDENTIFIER OF '\n'
           enum_item_list
       END
-    | ENUM '\n'
+    | ENUM OF '\n'
           enum_item_list
       END
-    | STRUCT IDENTIFIER '\n'
+    | STRUCT IDENTIFIER OF '\n'
           struct_item_list
       END
-    | STRUCT '\n'
+    | STRUCT OF '\n'
           struct_item_list
       END
     | type_name declarator_list
@@ -443,8 +443,8 @@ term
 // TODO: ! & * operators
 
 value
-    : LENGTHOF '(' reference ')'
-    | NUMBEROF '(' reference ')'
+    : LEN '(' reference ')'
+    | NUM '(' reference ')'
     | SIZEOF '(' reference ')'
     | value '(' argument_list ')'
     | value '[' expression ']'
