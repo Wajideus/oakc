@@ -15,6 +15,12 @@ extern void compile_statement_list(Statement_List *);
     const char *s;
     Statement_List *statement_list;
     Statement *statement;
+    Condition_List *condition_list;
+    Condition *condition;
+    Comparison_List *comparison_list;
+    Comparison *comparison;
+    Expression_List *expression_list;
+    Expression *expression;
 }
 
 %token DDEFINE DELSE DEND DIF DINCLUDE
@@ -38,6 +44,11 @@ extern void compile_statement_list(Statement_List *);
 
 %type <statement_list> statement_list
 %type <statement> statement
+%type <condition_list> condition_list
+%type <condition> condition
+%type <comparison_list> comparison_list
+%type <comparison> comparison
+%type <expression_list> expression_list
 
 %%
 
@@ -62,18 +73,18 @@ string_list
 statement_list
     : statement_list '\n' statement
       {
-          add_statement($$, $3);
+          add_statement_to_list($3, $$);
       }
     | statement_list ';' statement
       {
-          add_statement($$, $3);
+          add_statement_to_list($3, $$);
       }
     | statement_list '\n'
     | statement_list ';'
     | statement
       {
           $$ = create_statement_list();
-          add_statement($$, $1);
+          add_statement_to_list($1, $$);
       }
     | '\n'
       {
@@ -108,26 +119,26 @@ statement
           statement_list
       END
       {
-          $$ = as_statement(create_if_statement(NULL, /* conditions */
+          $$ = as_statement(create_if_statement($2, /* conditions */
                                                 $5  /* then_statements */));
       }
     | IF condition_list THEN '\n'
           statement_list
       ELSE statement
       {
-          $$ = as_statement(create_if_statement(NULL, /* conditions */
+          $$ = as_statement(create_if_statement($2, /* conditions */
                                                 $5  /* then_statements */));
       }
     | IF condition_list THEN '\n'
           statement_list
       END
       {
-          $$ = as_statement(create_if_statement(NULL, /* conditions */
+          $$ = as_statement(create_if_statement($2, /* conditions */
                                                 $5  /* then_statements */));
       }
     | RETURN expression_list
       {
-          $$ = as_statement(create_return_statement(NULL /* expressions */));
+          $$ = as_statement(create_return_statement($2 /* expressions */));
       }
     | RETURN
       {
@@ -151,8 +162,8 @@ statement
           statement_list
       END
       {
-          $$ = as_statement(create_while_statement(NULL, /* conditions*/
-                                                   $5    /* do_statements */));
+          $$ = as_statement(create_while_statement($2, /* conditions */
+                                                   $5  /* do_statements */));
       }
     | assignment
       {
@@ -339,27 +350,76 @@ argument
 
 condition_list
     : condition_list OR condition
+      {
+          add_condition_to_list($3, $$);
+      }
     | condition
+      {
+          $$ = create_condition_list();
+          add_condition_to_list($1, $$);
+      }
     ;
 
 condition
-    : condition AND comparison
+    : comparison_list
+      {
+          $$ = create_condition($1);
+      }
+    ;
+
+comparison_list
+    : comparison_list AND comparison
+      {
+          add_comparison_to_list($3, $$);
+      }
     | comparison
+      {
+          $$ = create_comparison_list();
+          add_comparison_to_list($1, $$);
+      }
     ;
 
 comparison
     : comparison EQ expression_list
+      {
+          $$ = create_comparison(EQUAL_COMPARISON, NULL, NULL);
+      }
     | comparison NEQ expression_list
+      {
+          $$ = create_comparison(NOT_EQUAL_COMPARISON, NULL, NULL);
+      }
     | comparison '<' expression_list
+      {
+          $$ = create_comparison(LESS_THAN_COMPARISON, NULL, NULL);
+      }
     | comparison '>' expression_list
+      {
+          $$ = create_comparison(GREATER_THAN_COMPARISON, NULL, NULL);
+      }
     | comparison LTEQ expression_list
+      {
+          $$ = create_comparison(LESS_THAN_EQUAL_COMPARISON, NULL, NULL);
+      }
     | comparison GTEQ expression_list
+      {
+          $$ = create_comparison(GREATER_THAN_EQUAL_COMPARISON, NULL, NULL);
+      }
     | expression_list
+      {
+          $$ = create_comparison(EQUAL_COMPARISON, NULL, NULL);
+      }
     ;
 
 expression_list
     : expression_list ',' expression
+      {
+          add_expression_to_list(create_expression(), $$);
+      }
     | expression
+      {
+          $$ = create_expression_list();
+          add_expression_to_list(create_expression(), $$);
+      }
     ;
 
 expression

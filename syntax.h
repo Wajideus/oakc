@@ -7,36 +7,9 @@
     ((size_t)&(((struct_type *)NULL)->field))
 #endif
 
+
 #define as_statement(thing) \
     ((Statement *)((char *)(thing) - offsetof(Statement, as)))
-
-
-#define create_break_statement(identifier) \
-    add_break_statement(NULL, identifier)
-
-#define create_call_statement() \
-    add_call_statement(NULL)
-
-#define create_continue_statement(identifier) \
-    add_continue_statement(NULL, identifier)
-
-#define create_defer_statement() \
-    add_defer_statement(NULL)
-
-#define create_if_statement(conditions, then_statements) \
-    add_if_statement(NULL, conditions, then_statements)
-
-#define create_return_statement(expressions) \
-    add_return_statement(NULL, expressions)
-
-#define create_set_statement() \
-    add_set_statement(NULL)
-
-#define create_switch_statement() \
-    add_switch_statement(NULL)
-
-#define create_while_statement(conditions, do_statements) \
-    add_while_statement(NULL, conditions, do_statements)
 
 
 typedef enum {
@@ -180,65 +153,73 @@ struct Statement_List {
 Expression_List *
 create_expression_list(void);
 
+void
+add_expression_to_list(Expression *expression,
+                       Expression_List *list);
+
 Expression *
-add_expression(Expression_List *expressions);
+create_expression(void);
 
 
 Comparison_List *
 create_comparison_list(void);
 
+void
+add_comparison_to_list(Comparison *comparison,
+                       Comparison_List *list);
+
 Comparison *
-add_comparison(Comparison_List *comparisons);
+create_comparison(Comparison_Type type,
+                  Expression_List *left_expressions,
+                  Expression_List *right_expressions);
 
 
 Condition_List *
 create_condition_list(void);
 
+void
+add_condition_to_list(Condition *condition,
+                      Condition_List *list);
+
 Condition *
-add_condition(Condition_List *conditions);
+create_condition(Comparison_List *comparisons);
 
 
 Statement_List *
 create_statement_list(void);
 
+void
+add_statement_to_list(Statement *statement,
+                      Statement_List *list);
+
 Break_Statement *
-add_break_statement(Statement_List *statements,
-                    const char *identifier);
+create_break_statement(const char *identifier);
 
 Call_Statement *
-add_call_statement(Statement_List *statements);
+create_call_statement(void);
 
 Continue_Statement *
-add_continue_statement(Statement_List *statements,
-                       const char *identifier);
+create_continue_statement(const char *identifier);
 
 Defer_Statement *
-add_defer_statement(Statement_List *statements);
+create_defer_statement(void);
 
 If_Statement *
-add_if_statement(Statement_List *statements,
-                 Condition_List *conditions,
-                 Statement_List *then_statements);
+create_if_statement(Condition_List *conditions,
+                    Statement_List *then_statements);
 
 Return_Statement *
-add_return_statement(Statement_List *statements,
-                     Expression_List *expressions);
+create_return_statement(Expression_List *expressions);
 
 Set_Statement *
-add_set_statement(Statement_List *statements);
+create_set_statement(void);
 
 Switch_Statement *
-add_switch_statement(Statement_List *statements);
+create_switch_statement(void);
 
 While_Statement *
-add_while_statement(Statement_List *statements,
-                    Condition_List *conditions,
-                    Statement_List *do_statements);
-
-
-Statement *
-add_statement(Statement_List *statements,
-              Statement *statement);
+create_while_statement(Condition_List *conditions,
+                       Statement_List *do_statements);
 
 
 #endif
