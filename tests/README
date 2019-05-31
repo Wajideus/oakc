@@ -1,0 +1,40 @@
+The Oak programming language aims to be a simple non-dogmatic improvement on
+the C programming language.
+
+
+Some of the changes add new functionality:
+
+    * Added support for tuples, immutable comparable strings, length-prefixed
+      arrays, array pointers, and proper modules.
+
+    * Added defer statements to make clean-up and error handling easier.
+
+    * Added a mixin modifier for structural polymorphism.
+
+    * Added support for order-independent declarations in the global scope.
+
+    * Added support for function overloading.
+
+    * Added support for initial struct values.
+
+
+Other changes are simple syntactic ones, such as:
+
+    * The '.' operator works on pointers, removing the need for '->'.
+
+    * Simplified operator precedence (now based on Golang)
+
+    * Strengthened the type system.
+
+    * Removed the need for parentheses in if statements, while statements, and
+      call statements to reduce syntactic noise.
+
+    * Removed curly braces and semicolons.
+
+    * Allowed #include directives to include multiple comma separated modules.
+
+
+The Oak philosophy is mechanism, not policy. While it does make a lot of
+things less cumbersome and error-prone than they would be in C, it doesn't
+necessarily raise the level of abstraction. You're responsible for memory and
+control flow.
