@@ -1,6 +1,6 @@
-.vscode
-*.save
+**/*.save
 *.o
+.vscode
 oakc
 parser.h
 y.output
