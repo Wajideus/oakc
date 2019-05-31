@@ -33,7 +33,7 @@ extern void compile_statement_list(Statement_List *);
 %token NUMBER
 %token STRING
 %token KFALSE KNULL KTRUE
-%token LEN NUM SIZEOF
+%token LENGTHOF NUMBEROF SIZEOF
 %token LSH RSH
 %token LTEQ GTEQ EQ NEQ
 %token AND OR
@@ -463,8 +463,8 @@ term
 // TODO: ! & * operators
 
 value
-    : LEN '(' reference ')'
-    | NUM '(' reference ')'
+    : LENGTHOF '(' reference ')'
+    | NUMBEROF '(' reference ')'
     | SIZEOF '(' reference ')'
     | value '(' argument_list ')'
     | value '[' expression ']'

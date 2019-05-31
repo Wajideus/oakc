@@ -1,3 +1,5 @@
+.vscode
+*.save
 *.o
 oakc
 parser.h

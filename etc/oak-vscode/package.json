@@ -1,0 +1,38 @@
+{
+    "name": "oak-theme-and-language",
+    "displayName": "Oak Theme and Language",
+    "version": "0.0.1",
+    "engines": {
+        "vscode": "^1.26.0"
+    },
+    "publisher": "wajideus",
+	"keywords": [
+		"Oak",
+		"IntelliSense",
+		"Language",
+		"Syntax",
+		"Dark",
+		"Theme"
+	],
+	"categories": [
+	    "Programming Languages",
+		"Themes"
+	],
+    "contributes": {
+        "languages": [{
+            "id": "oak",
+            "aliases": ["Oak", "oak"],
+            "extensions": [".oak"]
+        }],
+        "grammars": [{
+            "language": "oak",
+            "scopeName": "source.oak",
+            "path": "./syntaxes/oak.json"
+        }],
+		"themes": [{
+				"label": "Oak",
+				"uiTheme": "vs-dark",
+				"path": "./themes/oak.json"
+		}]
+    }
+}
