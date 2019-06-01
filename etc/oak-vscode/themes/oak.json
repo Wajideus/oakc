@@ -298,6 +298,14 @@
 			}
 		},
 		{
+			"name": "Preprocessor Directive",
+			"scope": "meta.preprocessor.keyword",
+			"settings": {
+				"fontStyle": "bold",
+				"foreground": "#34E2E2"
+			}
+		},
+		{
 			"name": "Keyword",
 			"scope": [
 				"keyword",
@@ -359,12 +367,11 @@
 		{
 			"name": "Preprocessor",
 			"scope": [
-				"meta.preprocessor",
-				"meta.preprocessor.keyword",
+				"meta.preprocessor"
 			],
 			"settings": {
 				"fontStyle": "bold",
-				"foreground": "#34E2E2"
+				"foreground": "#d6dade"
 			}
 		},
 		{
