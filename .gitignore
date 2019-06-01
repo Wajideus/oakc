@@ -1,4 +1,5 @@
 **/*.save
+**/*.swp
 *.o
 .vscode
 oakc

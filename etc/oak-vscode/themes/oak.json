@@ -303,7 +303,6 @@
 				"keyword",
 				"meta.property-value.keyword",
 				"support.constant.property-value.keyword",
-				"meta.preprocessor.keyword",
 				"keyword.other.use",
 				"keyword.other.function.use",
 				"keyword.other.namespace",
@@ -359,10 +358,13 @@
 		},
 		{
 			"name": "Preprocessor",
-			"scope": "meta.preprocessor",
+			"scope": [
+				"meta.preprocessor",
+				"meta.preprocessor.keyword",
+			],
 			"settings": {
-				"fontStyle": "",
-				"foreground": "#d6dade"
+				"fontStyle": "bold",
+				"foreground": "#34E2E2"
 			}
 		},
 		{

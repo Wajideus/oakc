@@ -4,6 +4,7 @@
    "foldingStartMarker": "\\{\\s*$",
    "foldingStopMarker": "'^\\s*\\}",
    "patterns": [
+		{"include": "#directive-keywords"},
 		{"include": "#declaration-keywords"},
       {"include": "#control-keywords"},
       {"include": "#branch-keywords"},
@@ -16,6 +17,14 @@
 		{"include": "#comments"}
    ],
    "repository": {
+		"directive-keywords": {
+			"match": "#(include)",
+			"captures": {
+				"1": {
+					"name": "meta.preprocessor.keyword"
+				}
+			}
+		},
       "declaration-keywords": {
          "match": "\\b(const|enum|func|struct|var)\\b",
          "name": "storage.type.oak"
@@ -45,7 +54,7 @@
          "name": "entity.name.type.oak"
       },
       "modifiers": {
-         "match": "\\b(extern|fixto|mixin|typedef)\\b",
+         "match": "\\b(extern|fixto|mixin|typedef|via)\\b",
          "name": "storage.modifier.oak"
 		},
 		"strings": {
