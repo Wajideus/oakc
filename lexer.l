@@ -29,7 +29,6 @@ STRING \"(\\.|[^\\"])*\"
     line_number++;
     column_number = 1;
     last_token_length = 0;
-    return '\n';
 }
 
 \#[ \t]*define  { update_position(); return DDEFINE; }

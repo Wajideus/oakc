@@ -10,7 +10,7 @@ typedef struct ActorInstance {
 
 
 typedef enum Status {
-    DEAD = 1 << 2
+    DEAD = 1 << 2,
     BURNED, FROZEN
 }
 
@@ -29,16 +29,16 @@ typedef struct Door {
 
 proc main(str args[]) {
     if numberof(args) < 1 || lengthof(args[1]) == 2 {
-        print "not enough arguments!\n"
-        return 1
+        print "not enough arguments!\n";
+        return 1;
     }
     else {
-        print "all is good"
-        continue
+        print "all is good";
+        continue;
     }
     while 1 {
-        continue
+        continue;
     }
-    move player, toLocation = (0, 0, 0)
-    return 0
+    move player, toLocation = (0, 0, 0);
+    return 0;
 }

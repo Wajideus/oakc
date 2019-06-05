@@ -43,7 +43,6 @@ extern void compile_statement_list(Statement_List *);
 %token ETC
 
 %type <statement_list> statement_list
-%type <statement> statement
 %type <condition_list> condition_list
 %type <condition> condition
 %type <comparison_list> comparison_list
@@ -53,16 +52,8 @@ extern void compile_statement_list(Statement_List *);
 %%
 
 file
-    : file '\n' definition
-    | file '\n' directive
-    | file '\n'
-    | definition
-    | directive
-    |
-    ;
-
-optional_whitespace
-    : optional_whitespace '\n'
+    : file definition
+    | file directive
     |
     ;
 
@@ -76,112 +67,90 @@ string_list
     ;
 
 statement_list
-    : statement_list '\n' statement
+    : statement_list BREAK IDENTIFIER ';'
       {
-          add_statement_to_list($3, $$);
+          add_statement_to_list(as_statement(create_break_statement($3)), $$);
       }
-    | statement_list ';' statement
+    | statement_list BREAK ';'
       {
-          add_statement_to_list($3, $$);
+          add_statement_to_list(as_statement(create_break_statement(NULL)), $$);
       }
-    | statement_list '\n'
-    | statement
+    | statement_list CONTINUE IDENTIFIER ';'
       {
-          $$ = create_statement_list();
-          add_statement_to_list($1, $$);
+          add_statement_to_list(as_statement(create_continue_statement($3)), $$);
       }
-    |
+    | statement_list CONTINUE ';'
       {
-          $$ = create_statement_list();
+          add_statement_to_list(as_statement(create_continue_statement(NULL)), $$);
       }
-    ;
-
-statement
-    : BREAK IDENTIFIER
+    | statement_list DEFER call_statement ';'
       {
-          $$ = as_statement(create_break_statement($2));
+          add_statement_to_list(as_statement(create_defer_statement()), $$);
       }
-    | BREAK
-      {
-          $$ = as_statement(create_break_statement(NULL));
-      }
-    | CONTINUE IDENTIFIER
-      {
-          $$ = as_statement(create_continue_statement($2));
-      }
-    | CONTINUE
-      {
-          $$ = as_statement(create_continue_statement(NULL));
-      }
-    | DEFER call_statement
-      {
-          $$ = as_statement(create_defer_statement());
-      }
-    | IF condition_list '{'
+    | statement_list IF condition_list '{'
           statement_list
-      '}' '\n'
+      '}'
       ELSE '{'
           statement_list
       '}'
       {
-          $$ = as_statement(create_if_statement($2, /* conditions */
-                                                $4  /* then_statements */));
+          add_statement_to_list(as_statement(create_if_statement($3, /* conditions */
+                                                                 $5  /* then_statements */)),
+                                $$);
       }
-    | IF condition_list '{'
-          statement_list
-      '}' '\n'
-      ELSE statement
-      {
-          $$ = as_statement(create_if_statement($2, /* conditions */
-                                                $4  /* then_statements */));
-      }
-    | IF condition_list '{'
+    | statement_list IF condition_list '{'
           statement_list
       '}'
       {
-          $$ = as_statement(create_if_statement($2, /* conditions */
-                                                $4  /* then_statements */));
+          add_statement_to_list(as_statement(create_if_statement($3, /* conditions */
+                                                                 $5  /* then_statements */)),
+                                $$);
       }
-    | RETURN expression_list
+    | statement_list RETURN expression_list ';'
       {
-          $$ = as_statement(create_return_statement($2 /* expressions */));
+          add_statement_to_list(as_statement(create_return_statement($3 /* expressions */)), $$);
       }
-    | RETURN
+    | statement_list RETURN ';'
       {
-          $$ = as_statement(create_return_statement(NULL));
+          add_statement_to_list(as_statement(create_return_statement(NULL)), $$);
       }
-    | SWITCH expression '{'
+    | statement_list SWITCH expression '{'
           case_list
-          DEFAULT '\n'
+          DEFAULT ':'
               statement_list
       '}'
       {
-          $$ = as_statement(create_switch_statement());
+          add_statement_to_list(as_statement(create_switch_statement()), $$);
       }
-    | SWITCH expression '{'
+    | statement_list SWITCH expression '{'
           case_list
       '}'
       {
-          $$ = as_statement(create_switch_statement());
+          add_statement_to_list(as_statement(create_switch_statement()), $$);
       }
-    | WHILE condition_list '{'
+    | statement_list WHILE condition_list '{'
           statement_list
       '}'
       {
-          $$ = as_statement(create_while_statement($2, /* conditions */
-                                                   $4  /* do_statements */));
+          add_statement_to_list(as_statement(create_while_statement($3, /* conditions */
+                                                                    $5  /* then_statements */)),
+                                $$);
       }
-    | assignment
+    | statement_list assignment ';'
       {
-          $$ = as_statement(create_set_statement());
+          add_statement_to_list(as_statement(create_set_statement()), $$);
       }
-    | definition
+    | statement_list definition ';'
       {
-          $$ = as_statement(create_define_statement());
+          add_statement_to_list(as_statement(create_define_statement()), $$);
       }
-    | call_statement
+    | statement_list call_statement ';'
       {
-          $$ = as_statement(create_call_statement());
+          add_statement_to_list(as_statement(create_call_statement()), $$);
+      }
+    |
+      {
+          $$ = create_statement_list();
       }
     ;
 
@@ -191,8 +160,7 @@ case_list
     ;
 
 case
-    : CASE expression '\n' statement_list
-    | CASE expression
+    : CASE expression ':' statement_list
     ;
 
 assignment
@@ -256,7 +224,7 @@ definition
     ;
 
 initializer_list
-    : initializer_list ',' optional_whitespace initializer
+    : initializer_list ',' initializer
     | initializer
     ;
 
@@ -265,9 +233,7 @@ initializer
     ;
 
 enum_item_list
-    : enum_item_list '\n' enum_item
-    | enum_item_list ',' enum_item
-    | enum_item_list '\n'
+    : enum_item_list ',' enum_item
     | enum_item_list ','
     | enum_item
     |
@@ -279,9 +245,7 @@ enum_item
     ;
 
 struct_item_list
-    : struct_item_list '\n' struct_item
-    | struct_item_list ';' struct_item
-    | struct_item_list '\n'
+    : struct_item_list ';' struct_item
     | struct_item_list ';'
     | struct_item
     |
@@ -335,12 +299,12 @@ type_name
     ;
 
 declarator_list
-    : declarator_list ',' optional_whitespace declarator
+    : declarator_list ',' declarator
     | declarator
     ;
 
 declarator
-    : name '=' optional_whitespace expression
+    : name '=' expression
     | name
     ;
 
@@ -365,7 +329,7 @@ call_statement
     ;
 
 argument_list
-    : argument_list ',' optional_whitespace argument
+    : argument_list ',' argument
     | argument
     ;
 
@@ -376,9 +340,9 @@ argument
     ;
 
 condition_list
-    : condition_list optional_whitespace OR optional_whitespace condition
+    : condition_list OR condition
       {
-          add_condition_to_list($5, $$);
+          add_condition_to_list($3, $$);
       }
     | condition
       {
@@ -395,9 +359,9 @@ condition
     ;
 
 comparison_list
-    : comparison_list AND optional_whitespace comparison
+    : comparison_list AND comparison
       {
-          add_comparison_to_list($4, $$);
+          add_comparison_to_list($3, $$);
       }
     | comparison
       {
@@ -407,29 +371,29 @@ comparison_list
     ;
 
 comparison
-    : expression_list EQ optional_whitespace expression_list
+    : expression_list EQ expression_list
       {
-          $$ = create_comparison(EQUAL_COMPARISON, $1, $4);
+          $$ = create_comparison(EQUAL_COMPARISON, $1, $3);
       }
-    | expression_list NEQ optional_whitespace expression_list
+    | expression_list NEQ expression_list
       {
-          $$ = create_comparison(NOT_EQUAL_COMPARISON, $1, $4);
+          $$ = create_comparison(NOT_EQUAL_COMPARISON, $1, $3);
       }
-    | expression_list '<' optional_whitespace expression_list
+    | expression_list '<' expression_list
       {
-          $$ = create_comparison(LESS_THAN_COMPARISON, $1, $4);
+          $$ = create_comparison(LESS_THAN_COMPARISON, $1, $3);
       }
-    | expression_list '>' optional_whitespace expression_list
+    | expression_list '>' expression_list
       {
-          $$ = create_comparison(GREATER_THAN_COMPARISON, $1, $4);
+          $$ = create_comparison(GREATER_THAN_COMPARISON, $1, $3);
       }
-    | expression_list LTEQ optional_whitespace expression_list
+    | expression_list LTEQ expression_list
       {
-          $$ = create_comparison(LESS_THAN_EQUAL_COMPARISON, $1, $4);
+          $$ = create_comparison(LESS_THAN_EQUAL_COMPARISON, $1, $3);
       }
-    | expression_list GTEQ optional_whitespace expression_list
+    | expression_list GTEQ expression_list
       {
-          $$ = create_comparison(GREATER_THAN_EQUAL_COMPARISON, NULL, $4);
+          $$ = create_comparison(GREATER_THAN_EQUAL_COMPARISON, NULL, $3);
       }
     | expression_list
       {
@@ -438,7 +402,7 @@ comparison
     ;
 
 expression_list
-    : expression_list ',' optional_whitespace expression
+    : expression_list ',' expression
       {
           add_expression_to_list(create_expression(), $$);
       }
@@ -450,20 +414,20 @@ expression_list
     ;
 
 expression
-    : expression '+' optional_whitespace term
-    | expression '-' optional_whitespace term
-    | expression '|' optional_whitespace term
-    | expression '^' optional_whitespace term
+    : expression '+' term
+    | expression '-' term
+    | expression '|' term
+    | expression '^' term
     | term
     ;
 
 term
-    : term '*' optional_whitespace value
-    | term '/' optional_whitespace value
-    | term '%' optional_whitespace value
-    | term '&' optional_whitespace value
-    | term LSH optional_whitespace value
-    | term RSH optional_whitespace value
+    : term '*' value
+    | term '/' value
+    | term '%' value
+    | term '&' value
+    | term LSH value
+    | term RSH value
     | value
     ;
 
