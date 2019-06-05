@@ -4,40 +4,41 @@
 const Actor actors[16]
 
 
-typedef struct ActorInstance of
+typedef struct ActorInstance {
     mixin fixto actors via int actor
-end
+}
 
 
-typedef enum Status of
+typedef enum Status {
     DEAD = 1 << 2
     BURNED, FROZEN
-end
+}
 
-typedef struct Entity of
-    Component *component[]
-    Status status
-end
+typedef struct Entity {
+    Component *component[];
+    Status status;
+}
 
-typedef struct Door of
-    mixin Entity entity
-    float openness
-end
+typedef struct Door {
+    mixin Entity entity;
+    float openness;
+}
 
 // sizeof("test") == sizeof(size_t) + sizeof(char) * (lengthof("test") + 1)
 // sizeof(int[3]) == sizeof(size_t) + sizeof(int) * 3
 
-func main(str args[]) => int
-    if numberof(args) < 1 || lengthof(args[1]) == 2 then
+proc main(str args[]) {
+    if numberof(args) < 1 || lengthof(args[1]) == 2 {
         print "not enough arguments!\n"
         return 1
-    else
+    }
+    else {
         print "all is good"
         continue
-    end
-    while 1 do
+    }
+    while 1 {
         continue
-    end
+    }
     move player, toLocation = (0, 0, 0)
     return 0
-end
+}

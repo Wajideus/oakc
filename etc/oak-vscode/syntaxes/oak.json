@@ -26,7 +26,7 @@
 			}
 		},
       "declaration-keywords": {
-         "match": "\\b(const|enum|func|struct|var)\\b",
+		 "match": "\\b(bool|char|enum|float|int|proc|str|struct|uint|void)\\b",
          "name": "storage.type.oak"
 		},
       "control-keywords": {
@@ -50,11 +50,11 @@
 			"name": "regular_constant.oak"
 		},
       "regular-typenames": {
-         "match": "\\b([A-Z][0-9A-Z_a-z]*|bool|char|float|int|str|uint|void)\\b",
+         "match": "\\b([A-Z][0-9A-Z_a-z]*)\\b",
          "name": "entity.name.type.oak"
       },
       "modifiers": {
-         "match": "\\b(extern|fixto|mixin|typedef|via)\\b",
+         "match": "\\b(const|extern|fixto|mixin|typedef|var|via)\\b",
          "name": "storage.modifier.oak"
 		},
 		"strings": {

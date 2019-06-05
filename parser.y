@@ -24,11 +24,11 @@ extern void compile_statement_list(Statement_List *);
 }
 
 %token DDEFINE DELSE DEND DIF DINCLUDE
-%token CASE DEFAULT DEFER DO ELSE IF SWITCH THEN WHILE
-%token BREAK CONTINUE END RETURN
-%token CONST ENUM FUNC STRUCT TYPEDEF UNION VAR
+%token CASE DEFAULT DEFER DO ELSE IF SWITCH WHILE
+%token BREAK CONTINUE RETURN
+%token CONST ENUM PROC STRUCT TYPEDEF UNION VAR
 %token BOOL CHAR FLOAT INT STR UINT VOID
-%token EXTERN FIXTO OF MIXIN VIA
+%token EXTERN FIXTO MIXIN VIA
 %token <s> IDENTIFIER TYPENAME
 %token NUMBER
 %token STRING
@@ -85,13 +85,12 @@ statement_list
           add_statement_to_list($3, $$);
       }
     | statement_list '\n'
-    | statement_list ';'
     | statement
       {
           $$ = create_statement_list();
           add_statement_to_list($1, $$);
       }
-    | '\n'
+    |
       {
           $$ = create_statement_list();
       }
@@ -118,28 +117,30 @@ statement
       {
           $$ = as_statement(create_defer_statement());
       }
-    | IF condition_list THEN '\n'
+    | IF condition_list '{'
           statement_list
-      ELSE '\n'
+      '}' '\n'
+      ELSE '{'
           statement_list
-      END
+      '}'
       {
           $$ = as_statement(create_if_statement($2, /* conditions */
-                                                $5  /* then_statements */));
+                                                $4  /* then_statements */));
       }
-    | IF condition_list THEN '\n'
+    | IF condition_list '{'
           statement_list
+      '}' '\n'
       ELSE statement
       {
           $$ = as_statement(create_if_statement($2, /* conditions */
-                                                $5  /* then_statements */));
+                                                $4  /* then_statements */));
       }
-    | IF condition_list THEN '\n'
+    | IF condition_list '{'
           statement_list
-      END
+      '}'
       {
           $$ = as_statement(create_if_statement($2, /* conditions */
-                                                $5  /* then_statements */));
+                                                $4  /* then_statements */));
       }
     | RETURN expression_list
       {
@@ -149,26 +150,26 @@ statement
       {
           $$ = as_statement(create_return_statement(NULL));
       }
-    | SWITCH expression '\n'
+    | SWITCH expression '{'
           case_list
           DEFAULT '\n'
               statement_list
-      END
+      '}'
       {
           $$ = as_statement(create_switch_statement());
       }
-    | SWITCH expression '\n'
+    | SWITCH expression '{'
           case_list
-      END
+      '}'
       {
           $$ = as_statement(create_switch_statement());
       }
-    | WHILE condition_list DO '\n'
+    | WHILE condition_list '{'
           statement_list
-      END
+      '}'
       {
           $$ = as_statement(create_while_statement($2, /* conditions */
-                                                   $5  /* do_statements */));
+                                                   $4  /* do_statements */));
       }
     | assignment
       {
@@ -191,7 +192,7 @@ case_list
 
 case
     : CASE expression '\n' statement_list
-    | CASE expression '\n'
+    | CASE expression
     ;
 
 assignment
@@ -224,30 +225,32 @@ reference
     ;
 
 definition
-    : TYPEDEF ENUM IDENTIFIER OF '\n'
+    : TYPEDEF ENUM IDENTIFIER '{'
           enum_item_list
-      END
-    | TYPEDEF FUNC IDENTIFIER '(' parameter_list ')'
-    | TYPEDEF FUNC IDENTIFIER '(' ')'
-    | TYPEDEF STRUCT IDENTIFIER OF '\n'
+      '}'
+    | TYPEDEF type_name IDENTIFIER '(' parameter_list ')'
+    | TYPEDEF type_name IDENTIFIER '(' ')'
+    | TYPEDEF STRUCT IDENTIFIER '{'
           struct_item_list
-      END
-    | EXTERN FUNC IDENTIFIER '(' parameter_list ')'
-    | EXTERN FUNC IDENTIFIER '(' ')'
-    | FUNC IDENTIFIER '(' parameter_list ')' '\n'
+      '}'
+    | EXTERN type_name IDENTIFIER '(' parameter_list ')'
+    | EXTERN type_name IDENTIFIER '(' ')'
+    | type_name IDENTIFIER '(' parameter_list ')' '{'
           statement_list
-      END
+      '}'
       {
           compile_statement_list($7);
       }
-    | FUNC IDENTIFIER '(' ')' '\n'
+    | type_name IDENTIFIER '(' ')' '{'
           statement_list
-      END
+      '}'
       {
           compile_statement_list($6);
       }
+    | CONST IDENTIFIER declarator_list
     | CONST type_name declarator_list
     | CONST initializer_list
+    | VAR IDENTIFIER declarator_list
     | VAR type_name declarator_list
     | VAR initializer_list
     ;
@@ -267,7 +270,7 @@ enum_item_list
     | enum_item_list '\n'
     | enum_item_list ','
     | enum_item
-    | '\n'
+    |
     ;
 
 enum_item
@@ -281,29 +284,33 @@ struct_item_list
     | struct_item_list '\n'
     | struct_item_list ';'
     | struct_item
-    | '\n'
+    |
     ;
 
 struct_item
-    : MIXIN type_name indirection IDENTIFIER '=' expression
+    : MIXIN IDENTIFIER indirection IDENTIFIER '=' expression
+    | MIXIN IDENTIFIER indirection IDENTIFIER
+    | MIXIN FIXTO reference VIA IDENTIFIER IDENTIFIER
+    | MIXIN type_name indirection IDENTIFIER '=' expression
     | MIXIN type_name indirection IDENTIFIER
     | MIXIN FIXTO reference VIA type_name IDENTIFIER
-    | MIXIN STRUCT OF '\n'
+    | MIXIN STRUCT '{'
           struct_item_list
-      END
+      '}'
     | FIXTO reference VIA type_name IDENTIFIER
-    | ENUM IDENTIFIER OF '\n'
+    | ENUM IDENTIFIER '{'
           enum_item_list
-      END
-    | ENUM OF '\n'
+      '}'
+    | ENUM '{'
           enum_item_list
-      END
-    | STRUCT IDENTIFIER OF '\n'
+      '}'
+    | STRUCT IDENTIFIER '{'
           struct_item_list
-      END
-    | STRUCT OF '\n'
+      '}'
+    | STRUCT '{'
           struct_item_list
-      END
+      '}'
+    | IDENTIFIER declarator_list
     | type_name declarator_list
     ;
 
@@ -317,11 +324,11 @@ parameter
     ;
 
 type_name
-    : IDENTIFIER
-    | BOOL
+    : BOOL
     | CHAR
     | FLOAT
     | INT
+    | PROC
     | STR
     | UINT
     | VOID
