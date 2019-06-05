@@ -83,7 +83,7 @@ statement_list
       {
           add_statement_to_list(as_statement(create_continue_statement(NULL)), $$);
       }
-    | statement_list DEFER call_statement ';'
+    | statement_list DEFER call_statement
       {
           add_statement_to_list(as_statement(create_defer_statement()), $$);
       }
@@ -136,15 +136,15 @@ statement_list
                                                                     $5  /* then_statements */)),
                                 $$);
       }
-    | statement_list assignment ';'
+    | statement_list assignment
       {
           add_statement_to_list(as_statement(create_set_statement()), $$);
       }
-    | statement_list definition ';'
+    | statement_list definition
       {
           add_statement_to_list(as_statement(create_define_statement()), $$);
       }
-    | statement_list call_statement ';'
+    | statement_list call_statement
       {
           add_statement_to_list(as_statement(create_call_statement()), $$);
       }
@@ -164,19 +164,19 @@ case
     ;
 
 assignment
-    : reference_list '=' expression_list
-    | reference ADDEQ expression
-    | reference SUBEQ expression
-    | reference MULEQ expression
-    | reference DIVEQ expression
-    | reference MODEQ expression
-    | reference ANDEQ expression
-    | reference OREQ expression
-    | reference XOREQ expression
-    | reference LSHEQ expression
-    | reference RSHEQ expression
-    | reference INC
-    | reference DEC
+    : reference_list '=' expression_list ';'
+    | reference ADDEQ expression ';'
+    | reference SUBEQ expression ';'
+    | reference MULEQ expression ';'
+    | reference DIVEQ expression ';'
+    | reference MODEQ expression ';'
+    | reference ANDEQ expression ';'
+    | reference OREQ expression ';'
+    | reference XOREQ expression ';'
+    | reference LSHEQ expression ';'
+    | reference RSHEQ expression ';'
+    | reference INC ';'
+    | reference DEC ';'
     ;
 
 reference_list
@@ -196,31 +196,31 @@ definition
     : TYPEDEF ENUM IDENTIFIER '{'
           enum_item_list
       '}'
-    | TYPEDEF type_name IDENTIFIER '(' parameter_list ')'
-    | TYPEDEF type_name IDENTIFIER '(' ')'
+    | TYPEDEF type_name indirection IDENTIFIER '(' parameter_list ')' ';'
+    | TYPEDEF type_name indirection IDENTIFIER '(' ')' ';'
     | TYPEDEF STRUCT IDENTIFIER '{'
           struct_item_list
       '}'
-    | EXTERN type_name IDENTIFIER '(' parameter_list ')'
-    | EXTERN type_name IDENTIFIER '(' ')'
-    | type_name IDENTIFIER '(' parameter_list ')' '{'
+    | EXTERN type_name indirection IDENTIFIER '(' parameter_list ')' ';'
+    | EXTERN type_name indirection IDENTIFIER '(' ')' ';'
+    | type_name indirection IDENTIFIER '(' parameter_list ')' '{'
+          statement_list
+      '}'
+      {
+          compile_statement_list($8);
+      }
+    | type_name indirection IDENTIFIER '(' ')' '{'
           statement_list
       '}'
       {
           compile_statement_list($7);
       }
-    | type_name IDENTIFIER '(' ')' '{'
-          statement_list
-      '}'
-      {
-          compile_statement_list($6);
-      }
-    | CONST IDENTIFIER declarator_list
-    | CONST type_name declarator_list
-    | CONST initializer_list
-    | VAR IDENTIFIER declarator_list
-    | VAR type_name declarator_list
-    | VAR initializer_list
+    | CONST IDENTIFIER declarator_list ';'
+    | CONST type_name declarator_list ';'
+    | CONST initializer_list ';'
+    | VAR IDENTIFIER declarator_list ';'
+    | VAR type_name declarator_list ';'
+    | VAR initializer_list ';'
     ;
 
 initializer_list
@@ -324,8 +324,8 @@ indirection
     ;
 
 call_statement
-    : IDENTIFIER argument_list
-    | IDENTIFIER
+    : IDENTIFIER argument_list ';'
+    | IDENTIFIER ';'
     ;
 
 argument_list

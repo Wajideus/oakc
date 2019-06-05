@@ -1,7 +1,7 @@
 #include "stdio", "stdlib"
 
 
-const Actor actors[16]
+const Actor actors[16];
 
 
 typedef struct ActorInstance {
@@ -28,6 +28,7 @@ typedef struct Door {
 // sizeof(int[3]) == sizeof(size_t) + sizeof(int) * 3
 
 proc main(str args[]) {
+    var int x = 5;
     if numberof(args) < 1 || lengthof(args[1]) == 2 {
         print "not enough arguments!\n";
         return 1;
