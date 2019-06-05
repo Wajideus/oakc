@@ -1,6 +1,7 @@
 %{
 #include <stdio.h>
 
+#include "array.h"
 #include "syntax.h"
 
 extern void yyerror(const char *s);
@@ -8,18 +9,18 @@ extern int yylex();
 extern int yyparse();
 extern FILE *yyin;
 
-extern void compile_statement_list(Statement_List *);
+extern void compile_statements(Statement **);
 %}
 
 %union {
     const char *s;
-    Statement_List *statement_list;
+    Statement **statements;
     Statement *statement;
-    Condition_List *condition_list;
+    Condition **conditions;
     Condition *condition;
-    Comparison_List *comparison_list;
+    Comparison **comparisons;
     Comparison *comparison;
-    Expression_List *expression_list;
+    Expression **expressions;
     Expression *expression;
 }
 
@@ -42,12 +43,12 @@ extern void compile_statement_list(Statement_List *);
 %token INC DEC
 %token ETC
 
-%type <statement_list> statement_list
-%type <condition_list> condition_list
+%type <statements> statements
+%type <conditions> conditions
 %type <condition> condition
-%type <comparison_list> comparison_list
+%type <comparisons> comparisons
 %type <comparison> comparison
-%type <expression_list> expression_list
+%type <expressions> expressions
 
 %%
 
@@ -58,113 +59,110 @@ file
     ;
 
 directive
-    : DINCLUDE string_list
+    : DINCLUDE strings
     ;
 
-string_list
-    : string_list ',' STRING
+strings
+    : strings ',' STRING
     | STRING
     ;
 
-statement_list
-    : statement_list BREAK IDENTIFIER ';'
+statements
+    : statements BREAK IDENTIFIER ';'
       {
-          add_statement_to_list(as_statement(create_break_statement($3)), $$);
+          add_array_element($$, as_statement(create_break_statement($3)));
       }
-    | statement_list BREAK ';'
+    | statements BREAK ';'
       {
-          add_statement_to_list(as_statement(create_break_statement(NULL)), $$);
+          add_array_element($$, as_statement(create_break_statement(NULL)));
       }
-    | statement_list CONTINUE IDENTIFIER ';'
+    | statements CONTINUE IDENTIFIER ';'
       {
-          add_statement_to_list(as_statement(create_continue_statement($3)), $$);
+          add_array_element($$, as_statement(create_continue_statement($3)));
       }
-    | statement_list CONTINUE ';'
+    | statements CONTINUE ';'
       {
-          add_statement_to_list(as_statement(create_continue_statement(NULL)), $$);
+          add_array_element($$, as_statement(create_continue_statement(NULL)));
       }
-    | statement_list DEFER call_statement
+    | statements DEFER call_statement
       {
-          add_statement_to_list(as_statement(create_defer_statement()), $$);
+          add_array_element($$, as_statement(create_defer_statement()));
       }
-    | statement_list IF condition_list '{'
-          statement_list
+    | statements IF conditions '{'
+          statements
       '}'
       ELSE '{'
-          statement_list
+          statements
       '}'
       {
-          add_statement_to_list(as_statement(create_if_statement($3, /* conditions */
-                                                                 $5  /* then_statements */)),
-                                $$);
+          add_array_element($$, as_statement(create_if_statement($3, /* conditions */
+                                                                 $5  /* then_statements */)));
       }
-    | statement_list IF condition_list '{'
-          statement_list
+    | statements IF conditions '{'
+          statements
       '}'
       {
-          add_statement_to_list(as_statement(create_if_statement($3, /* conditions */
-                                                                 $5  /* then_statements */)),
-                                $$);
+          add_array_element($$, as_statement(create_if_statement($3, /* conditions */
+                                                                 $5  /* then_statements */)));
       }
-    | statement_list RETURN expression_list ';'
+    | statements RETURN expressions ';'
       {
-          add_statement_to_list(as_statement(create_return_statement($3 /* expressions */)), $$);
+          add_array_element($$, as_statement(create_return_statement($3 /* expressions */)));
       }
-    | statement_list RETURN ';'
+    | statements RETURN ';'
       {
-          add_statement_to_list(as_statement(create_return_statement(NULL)), $$);
+          add_array_element($$, as_statement(create_return_statement(NULL)));
       }
-    | statement_list SWITCH expression '{'
-          case_list
+    | statements SWITCH expression '{'
+          cases
           DEFAULT ':'
-              statement_list
+              statements
       '}'
       {
-          add_statement_to_list(as_statement(create_switch_statement()), $$);
+          add_array_element($$, as_statement(create_switch_statement()));
       }
-    | statement_list SWITCH expression '{'
-          case_list
+    | statements SWITCH expression '{'
+          cases
       '}'
       {
-          add_statement_to_list(as_statement(create_switch_statement()), $$);
+          add_array_element($$, as_statement(create_switch_statement()));
       }
-    | statement_list WHILE condition_list '{'
-          statement_list
+    | statements WHILE conditions '{'
+          statements
       '}'
       {
-          add_statement_to_list(as_statement(create_while_statement($3, /* conditions */
-                                                                    $5  /* then_statements */)),
-                                $$);
+          add_array_element($$, as_statement(create_while_statement($3, /* conditions */
+                                                                    $5  /* do_statements */)));
       }
-    | statement_list assignment
+    | statements assignment
       {
-          add_statement_to_list(as_statement(create_set_statement()), $$);
+          add_array_element($$, as_statement(create_set_statement()));
       }
-    | statement_list definition
+    | statements definition
       {
-          add_statement_to_list(as_statement(create_define_statement()), $$);
+          add_array_element($$, as_statement(create_define_statement()));
       }
-    | statement_list call_statement
+    | statements call_statement
       {
-          add_statement_to_list(as_statement(create_call_statement()), $$);
+          add_array_element($$, as_statement(create_call_statement()));
       }
     |
       {
-          $$ = create_statement_list();
+          $$ = NULL;
       }
     ;
 
-case_list
-    : case_list case
+cases
+    : cases case
     | case
     ;
 
 case
-    : CASE expression ':' statement_list
+    : CASE expression ':' statements
     ;
 
 assignment
-    : reference_list '=' expression_list ';'
+    : references '=' expressions ';'
     | reference ADDEQ expression ';'
     | reference SUBEQ expression ';'
     | reference MULEQ expression ';'
@@ -179,8 +177,8 @@ assignment
     | reference DEC ';'
     ;
 
-reference_list
-    : reference_list ',' reference
+references
+    : references ',' reference
     | reference
     ;
 
@@ -194,37 +192,37 @@ reference
 
 definition
     : TYPEDEF ENUM IDENTIFIER '{'
-          enum_item_list
+          enum_items
       '}'
-    | TYPEDEF type_name indirection IDENTIFIER '(' parameter_list ')' ';'
+    | TYPEDEF type_name indirection IDENTIFIER '(' parameters ')' ';'
     | TYPEDEF type_name indirection IDENTIFIER '(' ')' ';'
     | TYPEDEF STRUCT IDENTIFIER '{'
-          struct_item_list
+          struct_items
       '}'
-    | EXTERN type_name indirection IDENTIFIER '(' parameter_list ')' ';'
+    | EXTERN type_name indirection IDENTIFIER '(' parameters ')' ';'
     | EXTERN type_name indirection IDENTIFIER '(' ')' ';'
-    | type_name indirection IDENTIFIER '(' parameter_list ')' '{'
-          statement_list
+    | type_name indirection IDENTIFIER '(' parameters ')' '{'
+          statements
       '}'
       {
-          compile_statement_list($8);
+          compile_statements($8);
       }
     | type_name indirection IDENTIFIER '(' ')' '{'
-          statement_list
+          statements
       '}'
       {
-          compile_statement_list($7);
+          compile_statements($7);
       }
-    | CONST IDENTIFIER declarator_list ';'
-    | CONST type_name declarator_list ';'
-    | CONST initializer_list ';'
-    | VAR IDENTIFIER declarator_list ';'
-    | VAR type_name declarator_list ';'
-    | VAR initializer_list ';'
+    | CONST IDENTIFIER declarators ';'
+    | CONST type_name declarators ';'
+    | CONST initializers ';'
+    | VAR IDENTIFIER declarators ';'
+    | VAR type_name declarators ';'
+    | VAR initializers ';'
     ;
 
-initializer_list
-    : initializer_list ',' initializer
+initializers
+    : initializers ',' initializer
     | initializer
     ;
 
@@ -232,9 +230,9 @@ initializer
     : IDENTIFIER '=' expression
     ;
 
-enum_item_list
-    : enum_item_list ',' enum_item
-    | enum_item_list ','
+enum_items
+    : enum_items ',' enum_item
+    | enum_items ','
     | enum_item
     |
     ;
@@ -244,9 +242,9 @@ enum_item
     | IDENTIFIER
     ;
 
-struct_item_list
-    : struct_item_list ';' struct_item
-    | struct_item_list ';'
+struct_items
+    : struct_items ';' struct_item
+    | struct_items ';'
     | struct_item
     |
     ;
@@ -259,27 +257,27 @@ struct_item
     | MIXIN type_name indirection IDENTIFIER
     | MIXIN FIXTO reference VIA type_name IDENTIFIER
     | MIXIN STRUCT '{'
-          struct_item_list
+          struct_items
       '}'
     | FIXTO reference VIA type_name IDENTIFIER
     | ENUM IDENTIFIER '{'
-          enum_item_list
+          enum_items
       '}'
     | ENUM '{'
-          enum_item_list
+          enum_items
       '}'
     | STRUCT IDENTIFIER '{'
-          struct_item_list
+          struct_items
       '}'
     | STRUCT '{'
-          struct_item_list
+          struct_items
       '}'
-    | IDENTIFIER declarator_list
-    | type_name declarator_list
+    | IDENTIFIER declarators
+    | type_name declarators
     ;
 
-parameter_list
-    : parameter_list ',' parameter
+parameters
+    : parameters ',' parameter
     | parameter
     ;
 
@@ -298,8 +296,8 @@ type_name
     | VOID
     ;
 
-declarator_list
-    : declarator_list ',' declarator
+declarators
+    : declarators ',' declarator
     | declarator
     ;
 
@@ -311,7 +309,7 @@ declarator
 name
     : indirection '(' '*' IDENTIFIER ')' '[' expression ']'
     | indirection '(' '*' IDENTIFIER ')' '[' ']'
-    | indirection '(' '*' IDENTIFIER ')' '(' parameter_list ')'
+    | indirection '(' '*' IDENTIFIER ')' '(' parameters ')'
     | indirection '(' '*' IDENTIFIER ')' '(' ')'
     | indirection IDENTIFIER
     | name '[' expression ']'
@@ -324,12 +322,12 @@ indirection
     ;
 
 call_statement
-    : IDENTIFIER argument_list ';'
+    : IDENTIFIER arguments ';'
     | IDENTIFIER ';'
     ;
 
-argument_list
-    : argument_list ',' argument
+arguments
+    : arguments ',' argument
     | argument
     ;
 
@@ -339,77 +337,77 @@ argument
     | ETC
     ;
 
-condition_list
-    : condition_list OR condition
+conditions
+    : conditions OR condition
       {
-          add_condition_to_list($3, $$);
+          add_array_element($$, $3);
       }
     | condition
       {
-          $$ = create_condition_list();
-          add_condition_to_list($1, $$);
+          $$ = NULL;
+          add_array_element($$, $1);
       }
     ;
 
 condition
-    : comparison_list
+    : comparisons
       {
           $$ = create_condition($1);
       }
     ;
 
-comparison_list
-    : comparison_list AND comparison
+comparisons
+    : comparisons AND comparison
       {
-          add_comparison_to_list($3, $$);
+          add_array_element($$, $3);
       }
     | comparison
       {
-          $$ = create_comparison_list();
-          add_comparison_to_list($1, $$);
+          $$ = NULL;
+          add_array_element($$, $1);
       }
     ;
 
 comparison
-    : expression_list EQ expression_list
+    : expressions EQ expressions
       {
           $$ = create_comparison(EQUAL_COMPARISON, $1, $3);
       }
-    | expression_list NEQ expression_list
+    | expressions NEQ expressions
       {
           $$ = create_comparison(NOT_EQUAL_COMPARISON, $1, $3);
       }
-    | expression_list '<' expression_list
+    | expressions '<' expressions
       {
           $$ = create_comparison(LESS_THAN_COMPARISON, $1, $3);
       }
-    | expression_list '>' expression_list
+    | expressions '>' expressions
       {
           $$ = create_comparison(GREATER_THAN_COMPARISON, $1, $3);
       }
-    | expression_list LTEQ expression_list
+    | expressions LTEQ expressions
       {
           $$ = create_comparison(LESS_THAN_EQUAL_COMPARISON, $1, $3);
       }
-    | expression_list GTEQ expression_list
+    | expressions GTEQ expressions
       {
           $$ = create_comparison(GREATER_THAN_EQUAL_COMPARISON, NULL, $3);
       }
-    | expression_list
+    | expressions
       {
           $$ = create_comparison(NO_COMPARISON, $1, NULL);
       }
     ;
 
-expression_list
-    : expression_list ',' expression
+expressions
+    : expressions ',' expression
       {
-          add_expression_to_list(create_expression(), $$);
+          add_array_element($$, create_expression());
       }
     | expression
       {
-          $$ = create_expression_list();
-          add_expression_to_list(create_expression(), $$);
+          $$ = NULL;
+          add_array_element($$, create_expression());
       }
     ;
 
@@ -437,10 +435,11 @@ value
     : LENGTHOF '(' reference ')'
     | NUMBEROF '(' reference ')'
     | SIZEOF '(' reference ')'
-    | value '(' argument_list ')'
+    | value '(' arguments ')'
+    | value '(' ')'
     | value '[' expression ']'
     | value '.' IDENTIFIER
-    | '(' condition_list ')'
+    | '(' conditions ')'
     | IDENTIFIER
     | NUMBER
     | STRING

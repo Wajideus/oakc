@@ -18,42 +18,12 @@ typedef struct {
 } Value;
 
 typedef struct {
-    // * / % & << >>
-    Value *value;
-} Value_List_Item;
-
-typedef struct {
-    Value_List_Item *first,
-                    *last;
-} Value_List;
-
-typedef struct {
-    Value_List values;
+    Value **values;
 } Term;
 
-typedef struct {
-    // + - | ^
-    Term term;
-} Term_List_Item;
-
-typedef struct {
-    Term_List_Item *first,
-                   *last;
-} Term_List;
-
 typedef struct Expression {
-    Term_List *terms;
+    Term **terms;
 } Expression;
-
-typedef struct Expression_List_Item {
-    struct Expression_List_Item *next;
-    Expression expression;
-} Expression_List_Item;
-
-typedef struct {
-    Expression_List_Item *first,
-                         *last;
-} Expression_List;
 
 typedef enum {
     NO_COMPARISON,
@@ -67,36 +37,15 @@ typedef enum {
 
 typedef struct {
     Comparison_Type type;
-    Expression_List *left_expressions;
-    Expression_List *right_expressions;
+    Expression **left_expressions;
+    Expression **right_expressions;
 } Comparison;
 
-typedef struct Comparison_List_Item {
-    struct Comparison_List_Item *next;
-    Comparison comparison;
-} Comparison_List_Item;
-
-typedef struct {
-    Comparison_List_Item *first,
-                         *last;
-} Comparison_List;
-
 struct Condition {
-    Comparison_List *comparisons;
+    Comparison **comparisons;
 };
 
-typedef struct Condition_List_Item {
-    struct Condition_List_Item *next;
-    Condition condition;
-} Condition_List_Item;
-
-typedef struct {
-    Condition_List_Item *first,
-                        *last;
-} Condition_List;
-
-
-typedef struct Statement_List Statement_List;
+typedef struct Statement Statement;
 
 typedef struct {
     const char *identifier;
@@ -117,12 +66,12 @@ typedef struct {
 } Define_Statement;
 
 typedef struct {
-    Condition_List *conditions;
-    Statement_List *then_statements;
+    Condition **conditions;
+    Statement **then_statements;
 } If_Statement;
 
 typedef struct {
-    Expression_List *expressions;
+    Expression **expressions;
 } Return_Statement;
 
 typedef struct {
@@ -132,8 +81,8 @@ typedef struct {
 } Switch_Statement;
 
 typedef struct {
-    Condition_List *conditions;
-    Statement_List *do_statements;
+    Condition **conditions;
+    Statement **do_statements;
 } While_Statement;
 
 typedef enum {
@@ -149,7 +98,7 @@ typedef enum {
     WHILE_STATEMENT
 } Statement_Type;
 
-typedef struct {
+struct Statement {
     Statement_Type type;
     union {
         Break_Statement break_statement;
@@ -163,60 +112,19 @@ typedef struct {
         Switch_Statement switch_statement;
         While_Statement while_statement;
     } as;
-} Statement;
-
-typedef struct Statement_List_Item {
-    struct Statement_List_Item *next;
-    Statement statement;
-} Statement_List_Item;
-
-struct Statement_List {
-    Statement_List_Item *first,
-                        *last;
 };
 
-
-Expression_List *
-create_expression_list(void);
-
-void
-add_expression_to_list(Expression *expression,
-                       Expression_List *list);
 
 Expression *
 create_expression(void);
 
-
-Comparison_List *
-create_comparison_list(void);
-
-void
-add_comparison_to_list(Comparison *comparison,
-                       Comparison_List *list);
-
 Comparison *
 create_comparison(Comparison_Type type,
-                  Expression_List *left_expressions,
-                  Expression_List *right_expressions);
-
-
-Condition_List *
-create_condition_list(void);
-
-void
-add_condition_to_list(Condition *condition,
-                      Condition_List *list);
+                  Expression **left_expressions,
+                  Expression **right_expressions);
 
 Condition *
-create_condition(Comparison_List *comparisons);
-
-
-Statement_List *
-create_statement_list(void);
-
-void
-add_statement_to_list(Statement *statement,
-                      Statement_List *list);
+create_condition(Comparison **comparisons);
 
 Break_Statement *
 create_break_statement(const char *identifier);
@@ -234,11 +142,11 @@ Define_Statement *
 create_define_statement(void);
 
 If_Statement *
-create_if_statement(Condition_List *conditions,
-                    Statement_List *then_statements);
+create_if_statement(Condition **conditions,
+                    Statement **then_statements);
 
 Return_Statement *
-create_return_statement(Expression_List *expressions);
+create_return_statement(Expression **expressions);
 
 Set_Statement *
 create_set_statement(void);
@@ -247,8 +155,8 @@ Switch_Statement *
 create_switch_statement(void);
 
 While_Statement *
-create_while_statement(Condition_List *conditions,
-                       Statement_List *do_statements);
+create_while_statement(Condition **conditions,
+                       Statement **do_statements);
 
 
 #endif

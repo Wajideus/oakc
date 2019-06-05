@@ -1,12 +1,13 @@
 #include <stdio.h>
 
+#include "array.h"
 #include "syntax.h"
 
 
 int indent_level = 0;
 
 
-void compile_statement_list(Statement_List *statements);
+void compile_statements(Statement **statements);
 
 
 static void indent(void) {
@@ -19,13 +20,11 @@ static void compile_expression(Expression *expression) {
     printf("[expr]");
 }
 
-static void compile_expression_list(Expression_List *list) {
-    if (list) {
-        Expression_List_Item *item = list->first;
-        while (item) {
-            compile_expression(&item->expression);
-            item = item->next;
-            if (item) {
+static void compile_expressions(Expression **expressions) {
+    if (expressions) {
+        for (int i = 0; i < array_length(expressions); i++) {
+            compile_expression(expressions[i]);
+            if (i < array_length(expressions) - 1) {
                 printf(", ");
             }
         }
@@ -34,43 +33,41 @@ static void compile_expression_list(Expression_List *list) {
 
 static void compile_comparison(Comparison *comparison) {
     if (comparison) {
-        compile_expression_list(comparison->left_expressions);
+        compile_expressions(comparison->left_expressions);
         switch (comparison->type) {
             case EQUAL_COMPARISON:
                 printf(" == ");
-                compile_expression_list(comparison->right_expressions);
+                compile_expressions(comparison->right_expressions);
                 break;
             case NOT_EQUAL_COMPARISON:
                 printf(" != ");
-                compile_expression_list(comparison->right_expressions);
+                compile_expressions(comparison->right_expressions);
                 break;
             case LESS_THAN_COMPARISON:
                 printf(" < ");
-                compile_expression_list(comparison->right_expressions);
+                compile_expressions(comparison->right_expressions);
                 break;
             case GREATER_THAN_COMPARISON:
                 printf(" > ");
-                compile_expression_list(comparison->right_expressions);
+                compile_expressions(comparison->right_expressions);
                 break;
             case LESS_THAN_EQUAL_COMPARISON:
                 printf(" <= ");
-                compile_expression_list(comparison->right_expressions);
+                compile_expressions(comparison->right_expressions);
                 break;
             case GREATER_THAN_EQUAL_COMPARISON:
                 printf(" >= ");
-                compile_expression_list(comparison->right_expressions);
+                compile_expressions(comparison->right_expressions);
                 break;
         }
     }
 }
 
-static void compile_comparison_list(Comparison_List *list) {
-    if (list) {
-        Comparison_List_Item *item = list->first;
-        while (item) {
-            compile_comparison(&item->comparison);
-            item = item->next;
-            if (item) {
+static void compile_comparisons(Comparison **comparisons) {
+    if (comparisons) {
+        for (int i = 0; i < array_length(comparisons); i++) {
+            compile_comparison(comparisons[i]);
+            if (i < array_length(comparisons) - 1) {
                 printf(" && ");
             }
         }
@@ -79,17 +76,15 @@ static void compile_comparison_list(Comparison_List *list) {
 
 static void compile_condition(Condition *condition) {
     if (condition) {
-        compile_comparison_list(condition->comparisons);
+        compile_comparisons(condition->comparisons);
     }
 }
 
-static void compile_condition_list(Condition_List *list) {
-    if (list) {
-        Condition_List_Item *item = list->first;
-        while (item) {
-            compile_condition(&item->condition);
-            item = item->next;
-            if (item) {
+static void compile_conditions(Condition **conditions) {
+    if (conditions) {
+        for (int i = 0; i < array_length(conditions); i++) {
+            compile_condition(conditions[i]);
+            if (i < array_length(conditions) - 1) {
                 printf(" || ");
             }
         }
@@ -142,10 +137,10 @@ static void compile_if_statement(If_Statement *statement) {
     if (statement) {
         indent();
         printf("if ");
-        compile_condition_list(statement->conditions);
+        compile_conditions(statement->conditions);
         printf(" then\n");
         indent_level++;
-        compile_statement_list(statement->then_statements);
+        compile_statements(statement->then_statements);
         indent_level--;
         indent();
         printf("end");
@@ -180,10 +175,10 @@ static void compile_while_statement(While_Statement *statement) {
     if (statement) {
         indent();
         printf("while ");
-        compile_condition_list(statement->conditions);
+        compile_conditions(statement->conditions);
         printf(" do\n");
         indent_level++;
-        compile_statement_list(statement->do_statements);
+        compile_statements(statement->do_statements);
         indent_level--;
         indent();
         printf("end");
@@ -227,16 +222,13 @@ static void compile_statement(Statement *statement) {
     }
 }
 
-void compile_statement_list(Statement_List *list) {
-    if (list) {
-        Statement_List_Item *item = list->first;
-        for (;;) {
-            if (!item) {
-                break;
+void compile_statements(Statement **statements) {
+    if (statements) {
+        for (int i = 0; i < array_length(statements); i++) {
+            compile_statement(statements[i]);
+            if (i < array_length(statements - 1)) {
+                printf("\n");
             }
-            compile_statement(&item->statement);
-            item = item->next;
-            printf("\n");
         }
     }
 }

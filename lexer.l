@@ -1,6 +1,7 @@
 %{
 #include <ctype.h>
 
+#include "array.h"
 #include "syntax.h"
 #include "parser.h"
 
