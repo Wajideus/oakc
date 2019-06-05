@@ -26,7 +26,7 @@ extern void compile_statements(Statement **);
 
 %token DDEFINE DELSE DEND DIF DINCLUDE
 %token CASE DEFAULT DEFER DO ELSE IF SWITCH WHILE
-%token BREAK CONTINUE RETURN
+%token BREAK CONTINUE FINISH RETURN
 %token CONST ENUM PROC STRUCT TYPEDEF UNION VAR
 %token BOOL CHAR FLOAT INT STR UINT VOID
 %token EXTERN FIXTO MIXIN VIA
@@ -87,6 +87,10 @@ statements
     | statements DEFER call_statement
       {
           add_array_element($$, as_statement(create_defer_statement()));
+      }
+    | statements FINISH IDENTIFIER ';'
+      {
+          add_array_element($$, as_statement(create_finish_statement($3)));
       }
     | statements IF conditions '{'
           statements

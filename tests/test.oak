@@ -24,22 +24,31 @@ typedef struct Door {
     float openness;
 }
 
-// sizeof("test") == sizeof(size_t) + sizeof(char) * (lengthof("test") + 1)
-// sizeof(int[3]) == sizeof(size_t) + sizeof(int) * 3
+
+// 'proc' is not a special keyword for functions, it's a typename, short for
+// 'process', which is used for concurrent programming.
 
 proc main(str args[]) {
-    var int x = 5;
-    if numberof(args) < 1 || lengthof(args[1]) == 2 {
-        print "not enough arguments!\n";
-        return 1;
+
+   // If you assign a returned 'proc' to an identifier or use it as an
+   // argument in a function call, you create an asynchronous process.
+    var proc copying = copyFile("file.txt", "directory/");
+
+    // An async proc isn't guaranteed to start until we transfer control to it
+    // at least once.
+    continue copying;
+
+    // You can force an async proc to complete by using a 'finish' statement.
+    finish copying;
+
+    // Checking on the state of a proc causes a transfer of control to it.
+    while copying {
+        print "still copying\n";
     }
-    else {
-        print "all is good";
-        continue;
-    }
-    while 1 {
-        continue;
-    }
-    move player, toLocation = (0, 0, 0);
-    return 0;
+
+    // If you don't 'catch' a returned proc, it gets executed sequentially.
+    copyFile "file2.txt", toLocation = "directory/";
+
+    // You can hoist a proc by returning it.
+    return copyFile("file3.txt", "directory/");
 }

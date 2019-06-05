@@ -107,6 +107,19 @@ create_define_statement(void) {
     }
 }
 
+Finish_Statement *
+create_finish_statement(const char *identifier) {
+    Statement *statement = malloc(sizeof(Statement));
+    if (statement) {
+        statement->type = FINISH_STATEMENT;
+        statement->as.finish_statement.identifier = identifier;
+        return &statement->as.finish_statement;
+    }
+    else {
+        return NULL;
+    }
+}
+
 If_Statement *
 create_if_statement(Condition **conditions,
                     Statement **then_statements) {

@@ -51,6 +51,7 @@ else      { update_position(); return ELSE; }
 enum      { update_position(); return ENUM; }
 extern    { update_position(); return EXTERN; }
 false     { update_position(); return KFALSE; }
+finish    { update_position(); return FINISH; }
 float     { update_position(); return FLOAT; }
 fixto     { update_position(); return FIXTO; }
 if        { update_position(); return IF; }

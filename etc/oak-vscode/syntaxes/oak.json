@@ -30,11 +30,11 @@
          "name": "storage.type.oak"
 		},
       "control-keywords": {
-         "match": "\\b(case|default|defer|do|else|end|for|if|of|switch|then|while)\\b",
+         "match": "\\b(case|default|defer|do|else|for|if|of|switch|while)\\b",
          "name": "keyword.control.oak"
       },
       "branch-keywords": {
-         "match": "\\b(break|continue|goto|return|exit)\\b",
+         "match": "\\b(break|continue|finish|goto|return)\\b",
          "name": "keyword.control.branch.oak"
       },
       "operator-keywords": {
