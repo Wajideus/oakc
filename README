@@ -2,34 +2,180 @@ The Oak programming language aims to be a simple non-dogmatic improvement on
 the C programming language.
 
 
-Some of the changes add new functionality:
+1.  The asterisk and square brackets for declarations have been moved onto the
+    typename instead of the declarator.
 
-    * Added support for tuples, immutable comparable strings, length-prefixed
-      arrays, array pointers, and proper modules.
+        int main(int argc, char*[] argv) {
+            ...
+        }
 
-    * Added defer statements to make clean-up and error handling easier.
-
-    * Added a mixin modifier for structural polymorphism.
-
-    * Added support for order-independent declarations in the global scope.
-
-    * Added support for function overloading.
-
-    * Added support for initial struct values.
+    This makes the syntax more consistent and easier to read.
 
 
-Other changes are simple syntactic ones, such as:
+2.  Expressions are not statements.
 
-    * The '.' operator works on pointers, removing the need for '->'.
+        die
 
-    * Simplified operator precedence (now based on Golang)
+    This allows functions with no arguments to be called without parentheses.
 
-    * Strengthened the type system.
 
-    * Removed the need for parentheses in if statements, while statements, and
-      call statements to reduce syntactic noise.
+3.  Assignments are not expressions.
 
-    * Allowed #include directives to include multiple comma separated modules.
+        Entity entity = {
+            position = Vec3.ZERO
+        };
+        move entity, toLocation="hello world\n"
+    
+    This allows for struct initialiizers and function calls to support the
+    assignment of a field or parameter by name.
+
+
+4.  Conditions are not expressions, and must be wrapped in parentheses if they
+    aren't part of an "if" or "while" statement.
+
+        if printStuff == TRUE {
+            printf "%b\n", (this != that)
+        }
+
+    This is one of the requirements for supporting tuples in the language.
+
+
+5.  All type definitions begin with "typedef".
+
+        typedef struct Entity {
+            Vec3 position;
+        }
+    
+    This just makes the language more consistent.
+
+
+6.  There's a "mixin" modifier.
+
+        typedef struct Monster {
+            mixin Entity entity;
+            float aggro;
+        }
+
+        Monster monster;
+        monster.position = Vec3.ZERO;   // monster.entity.position
+    
+    This saves a lot of typing and allows for structural polymorphism.
+
+
+7.  The '.' operator works on pointers.
+
+        Monster* monster = alloc(Monster);
+        monster.aggro = 0.75;
+    
+    This makes working with deep hierarchies less painful.
+
+
+8.  The '*', '/', '%', '&', '<<', and '>>' operators all have the same
+    precedence; and the '+', '-', '|', and '^' operators all have the
+    precedence. The '&&' operator also has a higher precedence than '||'.
+
+    This helps to prevent bugs caused by confusing operator precedence.
+
+
+9. There are references.
+
+        Monster& monster = alloc(Monster);
+    
+    This allows you to use operators on an object without having to
+    dereference it. Conversion between lvalues and references can be done
+    implicitly, which reduces noise in the program. These references, unlike
+    those in C++, are not guaranteed to be none-nullable. They are a feature,
+    not a constraint.
+
+
+10. Multiple comma-separated includes can by done at once.
+
+        #include "stdio", "stdlib"
+
+    This just saves some typing.
+
+
+11. There is a built-in length-prefixed immutable "str" string type.
+
+        str text = "Hello World";
+        print text;
+
+    This allows you to compare strings with '==' and '!=', and boosts the
+    performance of string operations by utilizing string interning, length
+    comparison, and vectorized operations. It also allows strings to contain
+    null bytes, which is useful for storing things like bytecode.
+
+
+12. There's a built-in unsigned int type called "uint".
+
+        uint x = 5;
+    
+    Typing "unsigned" is obnoxious.
+
+
+13. The "bool" type is built-in, so you don't have to include "stdbool.h".
+
+
+14. There's a built-in dictionary type called "dict", which is implemented as
+    a chained scatter table.
+
+        dict person;
+        person.name = "bob";
+        person.age = 26;
+        print person["age"];
+
+    A chained scatter table is extremely efficient and is a fundamental tool
+    for solving a large class of problems.
+
+
+15. There [will be] a built-in variant type called "any".
+
+    This is necessary to support dictionaries in the language. It also gives
+    the illusion of dynamic typing.
+
+
+16. There are 'defer' statements, which are executed in reverse order when
+    the function ends.
+
+        FILE* f = fopen("test.txt", "rb");
+        defer fclose(f);
+        ...
+
+    This allows recovering from multiple error vectors via state reversal.
+
+
+17. There's support for tuples.
+
+        x, y = 2, 4
+        if x, y == 2, 4 {
+            ...
+        }
+    
+    This is particular useful for things like swapping operations.
+
+
+18. There's support for proper modules instead of header files.
+
+
+19. There's support for order-independent declarations.
+
+
+20. There's support for function overloading.
+
+
+21. There's support for initial struct values.
+
+
+22. There's support for breaking and continuing labelled loops.
+
+        copying: while line = readline(file) {
+            if line.isEmpty {
+                break copying;
+            }
+        }
+
+
+23. You can change the location of the stack.
 
 
 The Oak philosophy is mechanism, not policy. While it does make a lot of

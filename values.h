@@ -39,6 +39,15 @@ typedef struct {
     size_t number_of_elements;
 } Array_Type;
 
+typedef struct
+{
+    Type *return_type;
+    Type *parameter_types;
+} Func_Type;
+
+typedef struct {
+} Proc_Type;
+
 typedef struct {
     const char *name;
     Type *type;
@@ -50,12 +59,6 @@ typedef struct {
     const char *name;
     Struct_Item_Type *item_types;
 } Struct_Type;
-
-typedef struct
-{
-    Type *return_type;
-    Type *parameter_types;
-} Func_Type;
 
 typedef struct {
 } Dict_Type;
@@ -70,8 +73,9 @@ struct Type {
         REF_TYPE,
         PTR_TYPE,
         ARRAY_TYPE,
-        STRUCT_TYPE,
         FUNC_TYPE,
+        PROC_TYPE,
+        STRUCT_TYPE,
         DICT_TYPE
     } tag;
     union {
@@ -82,8 +86,9 @@ struct Type {
         Ref_Type as_ref_type;
         Ptr_Type as_ptr_type;
         Array_Type as_array_type;
-        Struct_Type as_struct_type;
         Func_Type as_func_type;
+        Proc_Type as_proc_type;
+        Struct_Type as_struct_type;
         Dict_Type as_dict_type;
     };
 };
@@ -115,8 +120,9 @@ union Value {
     void *as_ref;
     void *as_ptr;
     void *as_array;
-    void *as_struct;
     void *as_func;
+    void *as_proc;
+    void *as_struct;
     Dict *as_dict;
 };
 
