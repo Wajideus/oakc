@@ -9,7 +9,7 @@ extern int yylex();
 extern int yyparse();
 extern FILE *yyin;
 
-extern const char **type_names;
+extern void declare_type(const char *);
 extern void compile_statements(Statement **);
 %}
 
@@ -56,9 +56,127 @@ extern void compile_statements(Statement **);
 %%
 
 file
-    : file definition
+    : file deferred_definition
+    | file definition
     | file directive
     |
+    ;
+
+deferred_definition
+    : TYPEDEF deferred_type IDENTIFIER '(' parameters ')' ';'
+      {
+          declare_type($3);
+      }
+    | TYPEDEF deferred_type IDENTIFIER '(' ')' ';'
+      {
+          declare_type($3);
+      }
+    | EXTERN deferred_type IDENTIFIER '(' parameters ')' ';'
+    | EXTERN deferred_type IDENTIFIER '(' ')' ';'
+    | deferred_type IDENTIFIER '(' parameters ')' '{'
+          statements
+      '}'
+      {
+          compile_statements($7);
+      }
+    | deferred_type IDENTIFIER '(' ')' '{'
+          statements
+      '}'
+      {
+          compile_statements($6);
+      }
+    | deferred_type declarators ';'
+    ;
+
+definition
+    : TYPEDEF type IDENTIFIER '(' parameters ')' ';'
+      {
+          declare_type($3);
+      }
+    | TYPEDEF type IDENTIFIER '(' ')' ';'
+      {
+          declare_type($3);
+      }
+    | TYPEDEF ENUM IDENTIFIER '{'
+          enum_items
+      '}'
+      {
+          declare_type($3);
+      }
+    | TYPEDEF STRUCT IDENTIFIER '{'
+          struct_items
+      '}'
+      {
+          declare_type($3);
+      }
+    | TYPEDEF STRUCT IDENTIFIER ';'
+      {
+          declare_type($3);
+      }
+    | EXTERN type IDENTIFIER '(' parameters ')' ';'
+    | EXTERN type IDENTIFIER '(' ')' ';'
+    | type IDENTIFIER '(' parameters ')' '{'
+          statements
+      '}'
+      {
+          compile_statements($7);
+      }
+    | type IDENTIFIER '(' ')' '{'
+          statements
+      '}'
+      {
+          compile_statements($6);
+      }
+    | type declarators ';'
+    ;
+
+deferred_type
+    : modifiers IDENTIFIER indirection '(' '*' ')' '(' parameters ')'
+    | modifiers IDENTIFIER indirection '(' '*' ')' '(' ')'
+    | modifiers IDENTIFIER indirection '[' expression ']'
+    | modifiers IDENTIFIER indirection '[' ']'
+    | modifiers IDENTIFIER indirection
+    ;
+
+type
+    : modifiers type_name indirection '(' parameters ')'
+    | modifiers type_name indirection '(' ')'
+    | modifiers type_name indirection '[' expression ']'
+    | modifiers type_name indirection '[' ']'
+    | modifiers type_name indirection
+    ;
+
+type_name
+    : TYPE_NAME
+    | BOOL
+    | CHAR
+    | DICT
+    | FLOAT
+    | INT
+    | PROC
+    | STR
+    | UINT
+    | VOID
+    ;
+
+modifiers
+    : CONST
+    |
+    ;
+
+indirection
+    : indirection '*'
+    |
+    ;
+
+declarators
+    : declarators ',' declarator
+    | declarator
+    ;
+
+declarator
+    : IDENTIFIER '=' expression
+    | IDENTIFIER
     ;
 
 directive
@@ -198,48 +316,6 @@ reference
     | IDENTIFIER
     ;
 
-definition
-    : TYPEDEF ENUM IDENTIFIER '{'
-          enum_items
-      '}'
-      {
-          add_array_element(type_names, $3);
-      }
-    | TYPEDEF STRUCT IDENTIFIER '{'
-          struct_items
-      '}'
-      {
-          add_array_element(type_names, $3);
-      }
-    | TYPEDEF STRUCT IDENTIFIER ';'
-      {
-          add_array_element(type_names, $3);
-      }
-    | TYPEDEF type IDENTIFIER '(' parameters ')' ';'
-      {
-          add_array_element(type_names, $3);
-      }
-    | TYPEDEF type IDENTIFIER '(' ')' ';'
-      {
-          add_array_element(type_names, $3);
-      }
-    | EXTERN type IDENTIFIER '(' parameters ')' ';'
-    | EXTERN type IDENTIFIER '(' ')' ';'
-    | type IDENTIFIER '(' parameters ')' '{'
-          statements
-      '}'
-      {
-          compile_statements($7);
-      }
-    | type IDENTIFIER '(' ')' '{'
-          statements
-      '}'
-      {
-          compile_statements($6);
-      }
-    | CONST type declarators ';'
-    | type declarators ';'
-    ;
 
 enum_items
     : enum_items ',' enum_item
@@ -261,6 +337,8 @@ struct_items
 struct_item
     : MIXIN FIXTO reference VIA IDENTIFIER IDENTIFIER ';'
     | MIXIN FIXTO reference VIA type_name IDENTIFIER ';'
+    | MIXIN deferred_type IDENTIFIER '=' expression ';'
+    | MIXIN deferred_type IDENTIFIER ';'
     | MIXIN type IDENTIFIER '=' expression ';'
     | MIXIN type IDENTIFIER ';'
     | MIXIN STRUCT '{'
@@ -279,6 +357,7 @@ struct_item
     | STRUCT '{'
           struct_items
       '}'
+    | deferred_type declarators ';'
     | type declarators ';'
     ;
 
@@ -289,42 +368,6 @@ parameters
 
 parameter
     : type IDENTIFIER
-    ;
-
-type
-    : type_name indirection '(' parameters ')'
-    | type_name indirection '(' ')'
-    | type_name indirection '[' expression ']'
-    | type_name indirection '[' ']'
-    | type_name indirection
-    ;
-
-type_name
-    : TYPE_NAME
-    | BOOL
-    | CHAR
-    | DICT
-    | FLOAT
-    | INT
-    | PROC
-    | STR
-    | UINT
-    | VOID
-    ;
-
-declarators
-    : declarators ',' declarator
-    | declarator
-    ;
-
-declarator
-    : IDENTIFIER '=' expression
-    | IDENTIFIER
-    ;
-
-indirection
-    : indirection '*'
-    |
     ;
 
 call_statement

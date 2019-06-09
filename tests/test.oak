@@ -1,9 +1,6 @@
 #include "stdio", "stdlib"
 
 
-typedef struct Actor;
-typedef struct Component;
-
 const Actor[16] actors;
 Component* component;
 

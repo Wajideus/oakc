@@ -18,6 +18,7 @@ int column_number = 1;
 
 const char **type_names = NULL;
 
+void declare_type(const char *identifier);
 bool is_type_name(const char *identifier);
 const char *interned_string(const char *string);
 %}
@@ -134,6 +135,12 @@ void yyerror(const char *error) {
     fprintf(stderr, "\"\n");
 }
 
+
+void declare_type(const char *type_name) {
+    if (!is_type_name(type_name)) {
+        add_array_element(type_names, type_name);
+    }
+}
 
 bool is_type_name(const char *identifier) {
     for (int i = 0; i < array_length(type_names); i++) {
