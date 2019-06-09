@@ -192,7 +192,21 @@ the C programming language.
         }
 
 
-The Oak philosophy is mechanism, not policy. While it does make a lot of
-things less cumbersome and error-prone than they would be in C, it doesn't
-necessarily raise the level of abstraction. You're responsible for memory and
-control flow.
+25. A cast from "T(*)()" to "T" is done implicitly via function call.
+
+        str text() {
+            return "Hello World!";
+        }
+
+        print text;
+    
+    This just removes some line noise.
+
+
+
+While  the Oak programming language does make a lot of things less cumbersome
+and error-prone than they would be in C, it doesn't necessarily raise the
+level of abstraction. You're still responsible for memory and control flow.
+
+The focus of the language's design is semantic compression. Idioms that are
+encouraged by the language will typically have a shorthand notation.
