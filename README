@@ -151,7 +151,7 @@ the C programming language.
             ...
         }
     
-    This is particular useful for things like swapping operations.
+    This is particularly useful for things like swapping operations.
 
 
 18. There's support for proper modules instead of header files.
@@ -176,6 +176,20 @@ the C programming language.
 
 
 23. You can change the location of the stack.
+
+
+24. There's a "proc" (process) type for coroutines.
+
+        proc dostuff() {
+            ...
+        }
+
+        int main(str[] args) {
+            proc doingstuff = dostuff();
+            while doingstuff {
+                ...
+            }
+        }
 
 
 The Oak philosophy is mechanism, not policy. While it does make a lot of
