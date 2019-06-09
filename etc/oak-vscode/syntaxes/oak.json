@@ -26,7 +26,7 @@
 			}
 		},
       "declaration-keywords": {
-		 "match": "\\b(bool|char|enum|float|int|proc|str|struct|uint|void)\\b",
+		 "match": "\\b(bool|char|dict|enum|float|int|proc|str|struct|uint|void)\\b",
          "name": "storage.type.oak"
 		},
       "control-keywords": {

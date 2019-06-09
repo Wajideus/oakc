@@ -1,11 +1,11 @@
 #include "stdio", "stdlib"
 
 
-const Actor actors[16];
+const Actor[16] actors;
 
 
 typedef struct ActorInstance {
-    mixin fixto actors via int actor
+    mixin fixto actors via int actor;
 }
 
 
@@ -15,7 +15,7 @@ typedef enum Status {
 }
 
 typedef struct Entity {
-    Component *component[];
+    Component*[] component;
     Status status;
 }
 
@@ -28,11 +28,11 @@ typedef struct Door {
 // 'proc' is not a special keyword for functions, it's a typename, short for
 // 'process', which is used for concurrent programming.
 
-proc main(str args[]) {
+proc main(str[] args) {
 
-   // If you assign a returned 'proc' to an identifier or use it as an
-   // argument in a function call, you create an asynchronous process.
-    var proc copying = copyFile("file.txt", "directory/");
+    // If you assign a returned 'proc' to an identifier or use it as an
+    // argument in a function call, you create an asynchronous process.
+    const proc copying = copyFile("file.txt", "directory/");
 
     // An async proc isn't guaranteed to start until we transfer control to it
     // at least once.

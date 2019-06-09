@@ -47,6 +47,7 @@ continue  { update_position(); return CONTINUE; }
 default   { update_position(); return DEFAULT; }
 defer     { update_position(); return DEFER; }
 do        { update_position(); return DO; }
+dict      { update_position(); return DICT; }
 else      { update_position(); return ELSE; }
 enum      { update_position(); return ENUM; }
 extern    { update_position(); return EXTERN; }

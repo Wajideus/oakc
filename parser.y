@@ -28,7 +28,7 @@ extern void compile_statements(Statement **);
 %token CASE DEFAULT DEFER DO ELSE IF SWITCH WHILE
 %token BREAK CONTINUE FINISH RETURN
 %token CONST ENUM PROC STRUCT TYPEDEF UNION VAR
-%token BOOL CHAR FLOAT INT STR UINT VOID
+%token BOOL CHAR DICT FLOAT INT STR UINT VOID
 %token EXTERN FIXTO MIXIN VIA
 %token <s> IDENTIFIER TYPENAME
 %token NUMBER
@@ -76,9 +76,9 @@ statements
       {
           add_array_element($$, as_statement(create_break_statement(NULL)));
       }
-    | statements CONTINUE IDENTIFIER ';'
+    | statements CONTINUE reference ';'
       {
-          add_array_element($$, as_statement(create_continue_statement($3)));
+          add_array_element($$, as_statement(create_continue_statement(NULL)));
       }
     | statements CONTINUE ';'
       {
@@ -88,9 +88,9 @@ statements
       {
           add_array_element($$, as_statement(create_defer_statement()));
       }
-    | statements FINISH IDENTIFIER ';'
+    | statements FINISH reference ';'
       {
-          add_array_element($$, as_statement(create_finish_statement($3)));
+          add_array_element($$, as_statement(create_finish_statement(NULL)));
       }
     | statements IF conditions '{'
           statements
@@ -150,6 +150,7 @@ statements
       {
           add_array_element($$, as_statement(create_call_statement()));
       }
+    | statements '{' statements '}'
     |
       {
           $$ = NULL;
@@ -198,30 +199,33 @@ definition
     : TYPEDEF ENUM IDENTIFIER '{'
           enum_items
       '}'
-    | TYPEDEF type_name indirection IDENTIFIER '(' parameters ')' ';'
-    | TYPEDEF type_name indirection IDENTIFIER '(' ')' ';'
     | TYPEDEF STRUCT IDENTIFIER '{'
           struct_items
       '}'
-    | EXTERN type_name indirection IDENTIFIER '(' parameters ')' ';'
-    | EXTERN type_name indirection IDENTIFIER '(' ')' ';'
-    | type_name indirection IDENTIFIER '(' parameters ')' '{'
-          statements
-      '}'
-      {
-          compile_statements($8);
-      }
-    | type_name indirection IDENTIFIER '(' ')' '{'
+    | TYPEDEF type IDENTIFIER '(' parameters ')' ';'
+    | TYPEDEF type IDENTIFIER '(' ')' ';'
+    | EXTERN type IDENTIFIER '(' parameters ')' ';'
+    | EXTERN type IDENTIFIER '(' ')' ';'
+    | type IDENTIFIER '(' parameters ')' '{'
           statements
       '}'
       {
           compile_statements($7);
       }
-    | CONST IDENTIFIER declarators ';'
-    | CONST type_name declarators ';'
+    | type IDENTIFIER '(' ')' '{'
+          statements
+      '}'
+      {
+          compile_statements($6);
+      }
+    | CONST IDENTIFIER indirection '(' parameters ')' declarators';'
+    | CONST IDENTIFIER indirection '(' ')' declarators';'
+    | CONST IDENTIFIER indirection '[' expression ']' declarators';'
+    | CONST IDENTIFIER indirection '[' ']' declarators';'
+    | CONST IDENTIFIER indirection declarators ';'
+    | CONST type declarators ';'
     | CONST initializers ';'
-    | VAR IDENTIFIER declarators ';'
-    | VAR type_name declarators ';'
+    | VAR type declarators ';'
     | VAR initializers ';'
     ;
 
@@ -247,23 +251,21 @@ enum_item
     ;
 
 struct_items
-    : struct_items ';' struct_item
-    | struct_items ';'
-    | struct_item
+    : struct_items struct_item
     |
     ;
 
 struct_item
-    : MIXIN IDENTIFIER indirection IDENTIFIER '=' expression
-    | MIXIN IDENTIFIER indirection IDENTIFIER
-    | MIXIN FIXTO reference VIA IDENTIFIER IDENTIFIER
-    | MIXIN type_name indirection IDENTIFIER '=' expression
-    | MIXIN type_name indirection IDENTIFIER
-    | MIXIN FIXTO reference VIA type_name IDENTIFIER
+    : MIXIN IDENTIFIER indirection IDENTIFIER '=' expression ';'
+    | MIXIN IDENTIFIER indirection IDENTIFIER ';'
+    | MIXIN FIXTO reference VIA IDENTIFIER IDENTIFIER ';'
+    | MIXIN FIXTO reference VIA type_name IDENTIFIER ';'
+    | MIXIN type IDENTIFIER '=' expression ';'
+    | MIXIN type IDENTIFIER ';'
     | MIXIN STRUCT '{'
           struct_items
       '}'
-    | FIXTO reference VIA type_name IDENTIFIER
+    | FIXTO reference VIA type_name IDENTIFIER ';'
     | ENUM IDENTIFIER '{'
           enum_items
       '}'
@@ -276,8 +278,12 @@ struct_item
     | STRUCT '{'
           struct_items
       '}'
-    | IDENTIFIER declarators
-    | type_name declarators
+    | IDENTIFIER indirection '(' parameters ')' declarators ';'
+    | IDENTIFIER indirection '(' ')' declarators ';'
+    | IDENTIFIER indirection '[' expression ']' declarators ';'
+    | IDENTIFIER indirection '[' ']' declarators ';'
+    | IDENTIFIER indirection declarators ';'
+    | type declarators ';'
     ;
 
 parameters
@@ -286,12 +292,26 @@ parameters
     ;
 
 parameter
-    : type_name declarator
+    : IDENTIFIER indirection '(' parameters ')' IDENTIFIER ';'
+    | IDENTIFIER indirection '(' ')' IDENTIFIER ';'
+    | IDENTIFIER indirection '[' expression ']' IDENTIFIER ';'
+    | IDENTIFIER indirection '[' ']' IDENTIFIER ';'
+    | IDENTIFIER indirection IDENTIFIER ';'
+    | type IDENTIFIER
+    ;
+
+type
+    : type_name '(' parameters ')'
+    | type_name '(' ')'
+    | type_name indirection '[' expression ']'
+    | type_name indirection '[' ']'
+    | type_name
     ;
 
 type_name
     : BOOL
     | CHAR
+    | DICT
     | FLOAT
     | INT
     | PROC
@@ -306,18 +326,8 @@ declarators
     ;
 
 declarator
-    : name '=' expression
-    | name
-    ;
-
-name
-    : indirection '(' '*' IDENTIFIER ')' '[' expression ']'
-    | indirection '(' '*' IDENTIFIER ')' '[' ']'
-    | indirection '(' '*' IDENTIFIER ')' '(' parameters ')'
-    | indirection '(' '*' IDENTIFIER ')' '(' ')'
-    | indirection IDENTIFIER
-    | name '[' expression ']'
-    | name '[' ']'
+    : IDENTIFIER '=' expression
+    | IDENTIFIER
     ;
 
 indirection

@@ -29,8 +29,6 @@ Other changes are simple syntactic ones, such as:
     * Removed the need for parentheses in if statements, while statements, and
       call statements to reduce syntactic noise.
 
-    * Removed curly braces and semicolons.
-
     * Allowed #include directives to include multiple comma separated modules.
 
 
