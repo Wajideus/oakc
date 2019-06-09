@@ -1,5 +1,6 @@
 %{
 #include <ctype.h>
+#include <stdbool.h>
 
 #include "array.h"
 #include "syntax.h"
@@ -14,6 +15,11 @@ int last_token_length = 0;
 
 int line_number = 1;
 int column_number = 1;
+
+const char **type_names = NULL;
+
+bool is_type_name(const char *identifier);
+const char *interned_string(const char *string);
 %}
 
 IDENTIFIER  [A-Z_a-z][0-9A-Z_a-z]*
@@ -74,7 +80,19 @@ var       { update_position(); return VAR; }
 via       { update_position(); return VIA; }
 void      { update_position(); return VOID; }
 while     { update_position(); return WHILE; }
-{IDENTIFIER}  { update_position(); return IDENTIFIER; }  // todo: check if type or identifier
+{IDENTIFIER}  {
+    // todo: check if type or identifier
+    update_position();
+    const char *identifier = interned_string(yytext);
+    if (is_type_name(identifier)) {
+        yylval.type_name = identifier;
+        return TYPE_NAME;
+    }
+    else {
+        yylval.identifier = identifier;
+        return IDENTIFIER;
+    }
+}
 {NUMBER}      { update_position(); return NUMBER; }
 {STRING}      { update_position(); return STRING; }
 \<\<    { update_position(); return LSH; }
@@ -114,4 +132,33 @@ void yyerror(const char *error) {
         }
     }
     fprintf(stderr, "\"\n");
+}
+
+
+bool is_type_name(const char *identifier) {
+    for (int i = 0; i < array_length(type_names); i++) {
+        if (type_names[i] == identifier) {
+            return true;
+        }
+    }
+    return false;
+}
+
+const char *interned_string(const char *string) {
+    typedef struct {
+        size_t length;
+        const char *data;
+    }  Interned_String;
+    static Interned_String *interned_strings = NULL;
+    size_t length = strlen(string);
+    for (int i = 0; i < array_length(interned_strings); i++) {
+        if (interned_strings[i].data == string
+            || (interned_strings[i].length == length
+                && !strncmp(string, interned_strings[i].data, length))) {
+            return interned_strings[i].data;
+        }
+    }
+    string = strndup(string, length);
+    add_array_element(interned_strings, ((Interned_String){length, string}));
+    return string;
 }

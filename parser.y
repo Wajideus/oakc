@@ -9,11 +9,13 @@ extern int yylex();
 extern int yyparse();
 extern FILE *yyin;
 
+extern const char **type_names;
 extern void compile_statements(Statement **);
 %}
 
 %union {
-    const char *s;
+    const char *identifier,
+               *type_name;
     Statement **statements;
     Statement *statement;
     Condition **conditions;
@@ -30,7 +32,8 @@ extern void compile_statements(Statement **);
 %token CONST ENUM PROC STRUCT TYPEDEF UNION VAR
 %token BOOL CHAR DICT FLOAT INT STR UINT VOID
 %token EXTERN FIXTO MIXIN VIA
-%token <s> IDENTIFIER TYPENAME
+%token <identifier> IDENTIFIER
+%token <type_name> TYPE_NAME
 %token NUMBER
 %token STRING
 %token KFALSE KNULL KTRUE
@@ -199,11 +202,27 @@ definition
     : TYPEDEF ENUM IDENTIFIER '{'
           enum_items
       '}'
+      {
+          add_array_element(type_names, $3);
+      }
     | TYPEDEF STRUCT IDENTIFIER '{'
           struct_items
       '}'
+      {
+          add_array_element(type_names, $3);
+      }
+    | TYPEDEF STRUCT IDENTIFIER ';'
+      {
+          add_array_element(type_names, $3);
+      }
     | TYPEDEF type IDENTIFIER '(' parameters ')' ';'
+      {
+          add_array_element(type_names, $3);
+      }
     | TYPEDEF type IDENTIFIER '(' ')' ';'
+      {
+          add_array_element(type_names, $3);
+      }
     | EXTERN type IDENTIFIER '(' parameters ')' ';'
     | EXTERN type IDENTIFIER '(' ')' ';'
     | type IDENTIFIER '(' parameters ')' '{'
@@ -218,24 +237,8 @@ definition
       {
           compile_statements($6);
       }
-    | CONST IDENTIFIER indirection '(' parameters ')' declarators';'
-    | CONST IDENTIFIER indirection '(' ')' declarators';'
-    | CONST IDENTIFIER indirection '[' expression ']' declarators';'
-    | CONST IDENTIFIER indirection '[' ']' declarators';'
-    | CONST IDENTIFIER indirection declarators ';'
     | CONST type declarators ';'
-    | CONST initializers ';'
-    | VAR type declarators ';'
-    | VAR initializers ';'
-    ;
-
-initializers
-    : initializers ',' initializer
-    | initializer
-    ;
-
-initializer
-    : IDENTIFIER '=' expression
+    | type declarators ';'
     ;
 
 enum_items
@@ -256,9 +259,7 @@ struct_items
     ;
 
 struct_item
-    : MIXIN IDENTIFIER indirection IDENTIFIER '=' expression ';'
-    | MIXIN IDENTIFIER indirection IDENTIFIER ';'
-    | MIXIN FIXTO reference VIA IDENTIFIER IDENTIFIER ';'
+    : MIXIN FIXTO reference VIA IDENTIFIER IDENTIFIER ';'
     | MIXIN FIXTO reference VIA type_name IDENTIFIER ';'
     | MIXIN type IDENTIFIER '=' expression ';'
     | MIXIN type IDENTIFIER ';'
@@ -278,11 +279,6 @@ struct_item
     | STRUCT '{'
           struct_items
       '}'
-    | IDENTIFIER indirection '(' parameters ')' declarators ';'
-    | IDENTIFIER indirection '(' ')' declarators ';'
-    | IDENTIFIER indirection '[' expression ']' declarators ';'
-    | IDENTIFIER indirection '[' ']' declarators ';'
-    | IDENTIFIER indirection declarators ';'
     | type declarators ';'
     ;
 
@@ -292,24 +288,20 @@ parameters
     ;
 
 parameter
-    : IDENTIFIER indirection '(' parameters ')' IDENTIFIER ';'
-    | IDENTIFIER indirection '(' ')' IDENTIFIER ';'
-    | IDENTIFIER indirection '[' expression ']' IDENTIFIER ';'
-    | IDENTIFIER indirection '[' ']' IDENTIFIER ';'
-    | IDENTIFIER indirection IDENTIFIER ';'
-    | type IDENTIFIER
+    : type IDENTIFIER
     ;
 
 type
-    : type_name '(' parameters ')'
-    | type_name '(' ')'
+    : type_name indirection '(' parameters ')'
+    | type_name indirection '(' ')'
     | type_name indirection '[' expression ']'
     | type_name indirection '[' ']'
-    | type_name
+    | type_name indirection
     ;
 
 type_name
-    : BOOL
+    : TYPE_NAME
+    | BOOL
     | CHAR
     | DICT
     | FLOAT

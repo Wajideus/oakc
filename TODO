@@ -2,8 +2,8 @@
   exist for testing purposes to ensure that the syntax tree is being
   formatted properly, and to test how a code generator should decend the tree.
 
-- The AST building functions need to be implemented and used by parser.y.
-
 - Error logging functionality needs to be added to the parser.
 
 - An LLVM emitter needs to be written.
+
+- Need to find a solution for order-independent type declarations.

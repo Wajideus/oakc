@@ -1,8 +1,11 @@
 #include "stdio", "stdlib"
 
 
-const Actor[16] actors;
+typedef struct Actor;
+typedef struct Component;
 
+const Actor[16] actors;
+Component* component;
 
 typedef struct ActorInstance {
     mixin fixto actors via int actor;
@@ -32,7 +35,7 @@ proc main(str[] args) {
 
     // If you assign a returned 'proc' to an identifier or use it as an
     // argument in a function call, you create an asynchronous process.
-    const proc copying = copyFile("file.txt", "directory/");
+    proc copying = copyFile("file.txt", "directory/");
 
     // An async proc isn't guaranteed to start until we transfer control to it
     // at least once.

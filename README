@@ -24,7 +24,7 @@ the C programming language.
         Entity entity = {
             position = Vec3.ZERO
         };
-        move entity, toLocation="hello world\n"
+        move entity, toLocation="hello world\n";
     
     This allows for struct initialiizers and function calls to support the
     assignment of a field or parameter by name.
@@ -34,7 +34,7 @@ the C programming language.
     aren't part of an "if" or "while" statement.
 
         if printStuff == TRUE {
-            printf "%b\n", (this != that)
+            printf "%b\n", (this != that);
         }
 
     This is one of the requirements for supporting tuples in the language.
@@ -204,7 +204,7 @@ the C programming language.
 
 
 
-While  the Oak programming language does make a lot of things less cumbersome
+While the Oak programming language does make a lot of things less cumbersome
 and error-prone than they would be in C, it doesn't necessarily raise the
 level of abstraction. You're still responsible for memory and control flow.
 
