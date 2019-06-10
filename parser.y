@@ -151,29 +151,25 @@ struct_items
     ;
 
 deferred_declaration
-    : deferred_declaration_specifiers declarators ';'
+    : deferred_declaration_specifier declarators ';'
     ;
 
-deferred_declaration_specifiers
-    :                                 storage_class_specifier
-    |                                 deferred_type_specifier
-    |                                 type_qualifier
-    | deferred_declaration_specifiers storage_class_specifier
-    | deferred_declaration_specifiers deferred_type_specifier
-    | deferred_declaration_specifiers type_qualifier
+deferred_declaration_specifier
+    : storage_class_specifier type_qualifiers deferred_type_specifier
+    | storage_class_specifier                 deferred_type_specifier
+    |                         type_qualifiers deferred_type_specifier
+    |                                         deferred_type_specifier
     ;
 
 declaration
-    : declaration_specifiers declarators ';'
+    : declaration_specifier declarators ';'
     ;
 
-declaration_specifiers
-    :                        storage_class_specifier
-    |                        type_specifier
-    |                        type_qualifier
-    | declaration_specifiers storage_class_specifier
-    | declaration_specifiers type_specifier
-    | declaration_specifiers type_qualifier
+declaration_specifier
+    : storage_class_specifier type_qualifiers type_specifier
+    | storage_class_specifier                 type_specifier
+    |                         type_qualifiers type_specifier
+    |                                         type_specifier
     ;
 
 declarators
@@ -262,13 +258,13 @@ type_definition
     ;
 
 deferred_function_definition
-    : deferred_declaration_specifiers declarator compound_statement
+    : deferred_declaration_specifier declarator compound_statement
         { compile_statements($3); }
     ;
 
 
 function_definition
-    : declaration_specifiers declarator compound_statement
+    : declaration_specifier declarator compound_statement
         { compile_statements($3); }
     ;
 
@@ -279,7 +275,7 @@ parameters
     ;
 
 parameter
-    : declaration_specifiers declarator
+    : declaration_specifier declarator
     ;
 
 statements

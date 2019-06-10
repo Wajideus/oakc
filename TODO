@@ -5,5 +5,3 @@
 - Error logging functionality needs to be added to the parser.
 
 - An LLVM emitter needs to be written.
-
-- Fix broken order-independent declarations.
