@@ -54,7 +54,7 @@
          "name": "entity.name.type.oak"
       },
       "modifiers": {
-         "match": "\\b(const|extern|fixto|mixin|typedef|var|via)\\b",
+         "match": "\\b(const|extern|fixto|mixin|ref|typedef|via)\\b",
          "name": "storage.modifier.oak"
 		},
 		"strings": {

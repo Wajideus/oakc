@@ -29,9 +29,9 @@ extern void compile_statements(Statement **);
 %token DDEFINE DELSE DEND DIF DINCLUDE
 %token CASE DEFAULT DEFER DO ELSE IF SWITCH WHILE
 %token BREAK CONTINUE FINISH RETURN
-%token CONST ENUM PROC STRUCT TYPEDEF UNION VAR
+%token ENUM PROC STRUCT TYPEDEF UNION
 %token BOOL CHAR DICT FLOAT INT STR UINT VOID
-%token EXTERN FIXTO MIXIN VIA
+%token CONST EXTERN FIXTO MIXIN REF VIA
 %token <identifier> IDENTIFIER
 %token <type_name> TYPE_NAME
 %token NUMBER
@@ -63,87 +63,79 @@ file
     ;
 
 deferred_definition
-    : TYPEDEF deferred_type IDENTIFIER '(' parameters ')' ';'
+    : TYPEDEF deferred_type indirection IDENTIFIER '(' parameters ')' ';'
       {
-          declare_type($3);
+          declare_type($4);
       }
-    | TYPEDEF deferred_type IDENTIFIER '(' ')' ';'
+    | TYPEDEF deferred_type indirection IDENTIFIER '(' ')' ';'
       {
-          declare_type($3);
+          declare_type($4);
       }
-    | EXTERN deferred_type IDENTIFIER '(' parameters ')' ';'
-    | EXTERN deferred_type IDENTIFIER '(' ')' ';'
-    | deferred_type IDENTIFIER '(' parameters ')' '{'
+    | EXTERN deferred_type indirection IDENTIFIER '(' parameters ')' ';'
+    | EXTERN deferred_type indirection IDENTIFIER '(' ')' ';'
+    | deferred_type indirection IDENTIFIER '(' parameters ')' '{'
+          statements
+      '}'
+      {
+          compile_statements($8);
+      }
+    | deferred_type indirection IDENTIFIER '(' ')' '{'
           statements
       '}'
       {
           compile_statements($7);
-      }
-    | deferred_type IDENTIFIER '(' ')' '{'
-          statements
-      '}'
-      {
-          compile_statements($6);
       }
     | deferred_type declarators ';'
     ;
 
 definition
-    : TYPEDEF type IDENTIFIER '(' parameters ')' ';'
+    : TYPEDEF type indirection IDENTIFIER '(' parameters ')' ';'
       {
-          declare_type($3);
+          declare_type($4);
       }
-    | TYPEDEF type IDENTIFIER '(' ')' ';'
+    | TYPEDEF type indirection IDENTIFIER '(' ')' ';'
       {
-          declare_type($3);
+          declare_type($4);
       }
-    | TYPEDEF ENUM IDENTIFIER '{'
+    | TYPEDEF modifiers ENUM IDENTIFIER '{'
           enum_items
       '}'
       {
-          declare_type($3);
+          declare_type($4);
       }
-    | TYPEDEF STRUCT IDENTIFIER '{'
+    | TYPEDEF modifiers STRUCT IDENTIFIER '{'
           struct_items
       '}'
       {
-          declare_type($3);
+          declare_type($4);
       }
-    | TYPEDEF STRUCT IDENTIFIER ';'
+    | TYPEDEF modifiers STRUCT IDENTIFIER ';'
       {
-          declare_type($3);
+          declare_type($4);
       }
-    | EXTERN type IDENTIFIER '(' parameters ')' ';'
-    | EXTERN type IDENTIFIER '(' ')' ';'
-    | type IDENTIFIER '(' parameters ')' '{'
+    | EXTERN type indirection IDENTIFIER '(' parameters ')' ';'
+    | EXTERN type indirection IDENTIFIER '(' ')' ';'
+    | type indirection IDENTIFIER '(' parameters ')' '{'
+          statements
+      '}'
+      {
+          compile_statements($8);
+      }
+    | type indirection IDENTIFIER '(' ')' '{'
           statements
       '}'
       {
           compile_statements($7);
       }
-    | type IDENTIFIER '(' ')' '{'
-          statements
-      '}'
-      {
-          compile_statements($6);
-      }
     | type declarators ';'
     ;
 
 deferred_type
-    : modifiers IDENTIFIER indirection '(' '*' ')' '(' parameters ')'
-    | modifiers IDENTIFIER indirection '(' '*' ')' '(' ')'
-    | modifiers IDENTIFIER indirection '[' expression ']'
-    | modifiers IDENTIFIER indirection '[' ']'
-    | modifiers IDENTIFIER indirection
+    : modifiers IDENTIFIER
     ;
 
 type
-    : modifiers type_name indirection '(' parameters ')'
-    | modifiers type_name indirection '(' ')'
-    | modifiers type_name indirection '[' expression ']'
-    | modifiers type_name indirection '[' ']'
-    | modifiers type_name indirection
+    : modifiers type_name
     ;
 
 type_name
@@ -160,7 +152,9 @@ type_name
     ;
 
 modifiers
-    : CONST
+    : CONST REF
+    | CONST
+    | REF
     |
     ;
 
@@ -175,8 +169,21 @@ declarators
     ;
 
 declarator
-    : IDENTIFIER '=' expression
-    | IDENTIFIER
+    : name '=' expression
+    | name
+    ;
+
+name
+    : indirection '(' '*' IDENTIFIER ')' '(' parameters ')'
+    | indirection '(' '*' IDENTIFIER ')' '(' ')'
+    | indirection '(' '*' IDENTIFIER ')' brackets
+    | indirection IDENTIFIER brackets
+    ;
+
+brackets
+    : brackets '[' expression ']'
+    | brackets '[' ']'
+    |
     ;
 
 directive
@@ -367,7 +374,7 @@ parameters
     ;
 
 parameter
-    : type IDENTIFIER
+    : type indirection IDENTIFIER brackets
     ;
 
 call_statement

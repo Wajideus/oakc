@@ -1,8 +1,8 @@
 #include "stdio", "stdlib"
 
 
-const Actor[16] actors;
-Component* component;
+const Actor actors[16];
+Component *component;
 
 typedef struct ActorInstance {
     mixin fixto actors via int actor;
@@ -14,8 +14,8 @@ typedef enum Status {
     BURNED, FROZEN
 }
 
-typedef struct Entity {
-    Component*[] component;
+typedef ref struct Entity {
+    Component *component[];
     Status status;
 }
 
@@ -28,7 +28,7 @@ typedef struct Door {
 // 'proc' is not a special keyword for functions, it's a typename, short for
 // 'process', which is used for concurrent programming.
 
-proc main(str[] args) {
+proc main(str args[]) {
 
     // If you assign a returned 'proc' to an identifier or use it as an
     // argument in a function call, you create an asynchronous process.

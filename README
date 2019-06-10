@@ -2,14 +2,10 @@ The Oak programming language aims to be a simple non-dogmatic improvement on
 the C programming language.
 
 
-1.  The asterisk and square brackets for declarations have been moved onto the
-    typename instead of the declarator.
+1.  Function calls do not require parentheses unless you're capturing their
+    return value.
 
-        int main(int argc, char*[] argv) {
-            ...
-        }
-
-    This makes the syntax more consistent and easier to read.
+        puts "Hello World!"
 
 
 2.  Expressions are not statements.
@@ -79,13 +75,19 @@ the C programming language.
 
 9. There are references.
 
-        Monster& monster = alloc(Monster);
+        ref Monster monster = alloc(Monster);
     
     This allows you to use operators on an object without having to
     dereference it. Conversion between lvalues and references can be done
     implicitly, which reduces noise in the program. These references, unlike
-    those in C++, are not guaranteed to be none-nullable. They are a feature,
-    not a constraint.
+    those in C++, are nullable.
+
+        typedef ref struct Entity {
+            Vec3 position;
+        }
+
+    One particular idiom is the definition of a reference type as shown above.
+    This removes the need to type "ref" everywhere.
 
 
 10. Multiple comma-separated includes can by done at once.
@@ -137,7 +139,7 @@ the C programming language.
 16. There are 'defer' statements, which are executed in reverse order when
     the function ends.
 
-        FILE* f = fopen("test.txt", "rb");
+        FILE *f = fopen("test.txt", "rb");
         defer fclose(f);
         ...
 
@@ -184,7 +186,7 @@ the C programming language.
             ...
         }
 
-        int main(str[] args) {
+        int main(str args[]) {
             proc doingstuff = dostuff();
             while doingstuff {
                 ...
