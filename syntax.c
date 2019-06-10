@@ -83,6 +83,18 @@ create_continue_statement(const char *identifier) {
     }
 }
 
+Declare_Statement *
+create_declare_statement(void) {
+    Statement *statement = malloc(sizeof(Statement));
+    if (statement) {
+        statement->type = DECLARE_STATEMENT;
+        return &statement->as.declare_statement;
+    }
+    else {
+        return NULL;
+    }
+}
+
 Defer_Statement *
 create_defer_statement(void) {
     Statement *statement = malloc(sizeof(Statement));

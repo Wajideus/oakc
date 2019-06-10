@@ -16,14 +16,30 @@ extern void compile_statements(Statement **);
 %union {
     const char *identifier,
                *type_name;
+
     Statement **statements;
-    Statement *statement;
     Condition **conditions;
-    Condition *condition;
     Comparison **comparisons;
-    Comparison *comparison;
     Expression **expressions;
+
+    Statement *statement;
+    Condition *condition;
+    Comparison *comparison;
     Expression *expression;
+
+    Break_Statement *break_statement;
+    Call_Statement *call_statement;
+    Statement **compound_statement;
+    Continue_Statement *continue_statement;
+    Declare_Statement *declare_statement;
+    Defer_Statement *defer_statement;
+    Define_Statement *define_statement;
+    Finish_Statement *finish_statement;
+    If_Statement *if_statement;
+    Return_Statement *return_statement;
+    Set_Statement *set_statement;
+    Switch_Statement *switch_statement;
+    While_Statement *while_statement;
 }
 
 %token DDEFINE DELSE DEND DIF DINCLUDE
@@ -48,97 +64,164 @@ extern void compile_statements(Statement **);
 
 %type <statements> statements
 %type <conditions> conditions
-%type <condition> condition
 %type <comparisons> comparisons
-%type <comparison> comparison
 %type <expressions> expressions
 
+%type <condition> condition
+%type <comparison> comparison
+%type <statement> statement
+
+%type <break_statement> break_statement
+%type <call_statement> call_statement
+%type <compound_statement> compound_statement
+%type <continue_statement> continue_statement
+%type <declare_statement> declare_statement
+%type <defer_statement> defer_statement
+%type <define_statement> define_statement
+%type <finish_statement> finish_statement
+%type <if_statement> if_statement
+%type <return_statement> return_statement
+%type <set_statement> set_statement
+%type <switch_statement> switch_statement
+%type <while_statement> while_statement
+
+%start translation_unit
 %%
 
-file
-    : file deferred_definition
-    | file definition
-    | file directive
-    |
+translation_unit
+    : /* empty */
+    | translation_unit directive
+    | translation_unit anonymous_enum
+    | translation_unit anonymous_struct
+    | translation_unit enum_declaration
+    | translation_unit struct_declaration
+    | translation_unit deferred_declaration
+    | translation_unit deferred_type_definition
+    | translation_unit deferred_function_definition
     ;
 
-deferred_definition
-    : TYPEDEF deferred_type indirection IDENTIFIER '(' parameters ')' ';'
-      {
-          declare_type($4);
-      }
-    | TYPEDEF deferred_type indirection IDENTIFIER '(' ')' ';'
-      {
-          declare_type($4);
-      }
-    | EXTERN deferred_type indirection IDENTIFIER '(' parameters ')' ';'
-    | EXTERN deferred_type indirection IDENTIFIER '(' ')' ';'
-    | deferred_type indirection IDENTIFIER '(' parameters ')' '{'
-          statements
-      '}'
-      {
-          compile_statements($8);
-      }
-    | deferred_type indirection IDENTIFIER '(' ')' '{'
-          statements
-      '}'
-      {
-          compile_statements($7);
-      }
-    | deferred_type declarators ';'
+directive
+    : DINCLUDE strings
     ;
 
-definition
-    : TYPEDEF type indirection IDENTIFIER '(' parameters ')' ';'
-      {
-          declare_type($4);
-      }
-    | TYPEDEF type indirection IDENTIFIER '(' ')' ';'
-      {
-          declare_type($4);
-      }
-    | TYPEDEF modifiers ENUM IDENTIFIER '{'
-          enum_items
-      '}'
-      {
-          declare_type($4);
-      }
-    | TYPEDEF modifiers STRUCT IDENTIFIER '{'
-          struct_items
-      '}'
-      {
-          declare_type($4);
-      }
-    | TYPEDEF modifiers STRUCT IDENTIFIER ';'
-      {
-          declare_type($4);
-      }
-    | EXTERN type indirection IDENTIFIER '(' parameters ')' ';'
-    | EXTERN type indirection IDENTIFIER '(' ')' ';'
-    | type indirection IDENTIFIER '(' parameters ')' '{'
-          statements
-      '}'
-      {
-          compile_statements($8);
-      }
-    | type indirection IDENTIFIER '(' ')' '{'
-          statements
-      '}'
-      {
-          compile_statements($7);
-      }
-    | type declarators ';'
+strings
+    : strings ',' STRING
+    | STRING
     ;
 
-deferred_type
-    : modifiers IDENTIFIER
+anonymous_enum
+    : ENUM '{' enum_items '}'
+    | ENUM '{'            '}'
     ;
 
-type
-    : modifiers type_name
+anonymous_struct
+    : STRUCT '{' struct_items '}'
+    | STRUCT '{'              '}'
     ;
 
-type_name
+enum_declaration
+    : ENUM IDENTIFIER '{' enum_items '}'
+    | ENUM IDENTIFIER '{'            '}'
+    ;
+
+enum_items
+    :                IDENTIFIER '=' expression
+    |                IDENTIFIER
+    | enum_items ',' IDENTIFIER '=' expression
+    | enum_items ',' IDENTIFIER
+    | enum_items ','
+    ;
+
+struct_declaration
+    : STRUCT IDENTIFIER '{' struct_items '}'
+    | STRUCT IDENTIFIER '{'              '}'
+    ;
+
+struct_items
+    :              anonymous_enum
+    |              anonymous_struct
+    |              enum_declaration
+    |              struct_declaration
+    |              deferred_declaration
+    | struct_items anonymous_enum
+    | struct_items anonymous_struct
+    | struct_items enum_declaration
+    | struct_items struct_declaration
+    | struct_items deferred_declaration
+    ;
+
+deferred_declaration
+    : deferred_declaration_specifiers declarators ';'
+    ;
+
+deferred_declaration_specifiers
+    :                                 storage_class_specifier
+    |                                 deferred_type_specifier
+    |                                 type_qualifier
+    | deferred_declaration_specifiers storage_class_specifier
+    | deferred_declaration_specifiers deferred_type_specifier
+    | deferred_declaration_specifiers type_qualifier
+    ;
+
+declaration
+    : declaration_specifiers declarators ';'
+    ;
+
+declaration_specifiers
+    :                        storage_class_specifier
+    |                        type_specifier
+    |                        type_qualifier
+    | declaration_specifiers storage_class_specifier
+    | declaration_specifiers type_specifier
+    | declaration_specifiers type_qualifier
+    ;
+
+declarators
+    :                 initialized_declarator
+    |                 declarator
+    | declarators ',' initialized_declarator
+    | declarators ',' declarator
+    ;
+
+declarator
+    :             direct_declarator
+    | indirection direct_declarator
+    ;
+
+direct_declarator
+    : IDENTIFIER
+    | '(' declarator ')'
+    | direct_declarator '[' expression ']'
+    | direct_declarator '[' ']'
+    | direct_declarator '(' parameters ')'
+    | direct_declarator '(' ')'
+    ;
+
+initialized_declarator
+    : declarator '=' initializer
+    ;
+
+initializer
+    : expression
+    ;
+
+indirection
+    :             '*'
+    |             '*' type_qualifiers
+    | indirection '*'
+    | indirection '*' type_qualifiers
+    ;
+
+storage_class_specifier
+    : EXTERN
+    ;
+
+deferred_type_specifier
+    : IDENTIFIER
+    | type_specifier
+    ;
+
+type_specifier
     : TYPE_NAME
     | BOOL
     | CHAR
@@ -151,140 +234,212 @@ type_name
     | VOID
     ;
 
-modifiers
-    : CONST REF
-    | CONST
+type_qualifiers
+    :                 type_qualifier
+    | type_qualifiers type_qualifier
+    ;
+
+type_qualifier
+    : CONST
+    | MIXIN
     | REF
-    |
     ;
 
-indirection
-    : indirection '*'
-    |
+deferred_type_definition
+    : TYPEDEF REF enum_declaration
+    | TYPEDEF     enum_declaration
+    | TYPEDEF REF struct_declaration
+    | TYPEDEF     struct_declaration
+    | TYPEDEF deferred_declaration
     ;
 
-declarators
-    : declarators ',' declarator
-    | declarator
+type_definition
+    : TYPEDEF REF enum_declaration
+    | TYPEDEF     enum_declaration
+    | TYPEDEF REF struct_declaration
+    | TYPEDEF     struct_declaration
+    | TYPEDEF declaration
     ;
 
-declarator
-    : name ':' expression '=' expression
-    | name ':' expression
-    | name '=' expression
-    | name
+deferred_function_definition
+    : deferred_declaration_specifiers declarator compound_statement
+        { compile_statements($3); }
     ;
 
-name
-    : indirection '(' '*' IDENTIFIER ')' '(' parameters ')'
-    | indirection '(' '*' IDENTIFIER ')' '(' ')'
-    | indirection '(' '*' IDENTIFIER ')' brackets
-    | indirection IDENTIFIER brackets
+
+function_definition
+    : declaration_specifiers declarator compound_statement
+        { compile_statements($3); }
     ;
 
-brackets
-    : brackets '[' expression ']'
-    | brackets '[' ']'
-    |
+
+parameters
+    : parameters ',' parameter
+    | parameter
     ;
 
-directive
-    : DINCLUDE strings
-    ;
-
-strings
-    : strings ',' STRING
-    | STRING
+parameter
+    : declaration_specifiers declarator
     ;
 
 statements
-    : statements BREAK IDENTIFIER ';'
-      {
-          add_array_element($$, as_statement(create_break_statement($3)));
-      }
-    | statements BREAK ';'
-      {
-          add_array_element($$, as_statement(create_break_statement(NULL)));
-      }
-    | statements CONTINUE reference ';'
-      {
-          add_array_element($$, as_statement(create_continue_statement(NULL)));
-      }
-    | statements CONTINUE ';'
-      {
-          add_array_element($$, as_statement(create_continue_statement(NULL)));
-      }
-    | statements DEFER call_statement
-      {
-          add_array_element($$, as_statement(create_defer_statement()));
-      }
-    | statements FINISH reference ';'
-      {
-          add_array_element($$, as_statement(create_finish_statement(NULL)));
-      }
-    | statements IF conditions '{'
-          statements
-      '}'
-      ELSE '{'
-          statements
-      '}'
-      {
-          add_array_element($$, as_statement(create_if_statement($3, /* conditions */
-                                                                 $5  /* then_statements */)));
-      }
-    | statements IF conditions '{'
-          statements
-      '}'
-      {
-          add_array_element($$, as_statement(create_if_statement($3, /* conditions */
-                                                                 $5  /* then_statements */)));
-      }
-    | statements RETURN expressions ';'
-      {
-          add_array_element($$, as_statement(create_return_statement($3 /* expressions */)));
-      }
-    | statements RETURN ';'
-      {
-          add_array_element($$, as_statement(create_return_statement(NULL)));
-      }
-    | statements SWITCH expression '{'
+    : /* empty */
+        { $$ = NULL; }
+    | statements statement
+        { add_array_element($$, $2); }
+    ;
+
+statement
+    : break_statement
+        { $$ = as_statement($1); }
+    | call_statement
+        { $$ = as_statement($1); }
+    | compound_statement
+        { $$ = as_statement($1); }
+    | continue_statement
+        { $$ = as_statement($1); }
+    | declare_statement
+        { $$ = as_statement($1); }
+    | defer_statement
+        { $$ = as_statement($1); }
+    | define_statement
+        { $$ = as_statement($1); }
+    | finish_statement
+        { $$ = as_statement($1); }
+    | if_statement
+        { $$ = as_statement($1); }
+    | return_statement
+        { $$ = as_statement($1); }
+    | set_statement
+        { $$ = as_statement($1); }
+    | switch_statement
+        { $$ = as_statement($1); }
+    | while_statement
+        { $$ = as_statement($1); }
+    ;
+
+break_statement
+    : BREAK IDENTIFIER ';'
+        { $$ = create_break_statement($2); }
+    | BREAK ';'
+        { $$ = create_break_statement(NULL); }
+    ;
+
+call_statement
+    : IDENTIFIER arguments ';'
+        { $$ = create_call_statement(); }
+    | IDENTIFIER ';'
+        { $$ = create_call_statement(); }
+    ;
+
+arguments
+    : arguments ',' argument
+    | argument
+    ;
+
+argument
+    : IDENTIFIER '=' expression
+    | expression
+    | ETC
+    ;
+
+compound_statement
+    : '{' statements '}'
+        { $$ = $2; }
+    ;
+
+continue_statement
+    : CONTINUE IDENTIFIER ';'
+        { $$ = create_continue_statement($2); }
+    | CONTINUE ';'
+        { $$ = create_continue_statement(NULL); }
+    ;
+
+declare_statement
+    : enum_declaration
+        { $$ = create_declare_statement(); }
+    | struct_declaration
+        { $$ = create_declare_statement(); }
+    | declaration
+        { $$ = create_declare_statement(); }
+    ;
+
+defer_statement
+    : DEFER call_statement
+        { $$ = create_defer_statement(); }
+    ;
+
+define_statement
+    : anonymous_enum
+        { $$ = create_define_statement(); }
+    | anonymous_struct
+        { $$ = create_define_statement(); }
+    | type_definition
+        { $$ = create_define_statement(); }
+    | function_definition
+        { $$ = create_define_statement(); }
+    ;
+
+finish_statement
+    : FINISH references ';'
+        { $$ = create_finish_statement(NULL); }
+    ;
+
+if_statement
+    : IF conditions compound_statement
+      ELSE compound_statement
+        { $$ = create_if_statement($2, $3); }
+    | IF conditions compound_statement
+        { $$ = create_if_statement($2, $3); }
+    ;
+
+return_statement
+    : RETURN expressions ';'
+        { $$ = create_return_statement($2); }
+    | RETURN ';'
+        { $$ = create_return_statement(NULL); }
+    ;
+
+set_statement
+    : references '=' expressions ';'
+        { $$ = create_set_statement(); }
+    | reference ADDEQ expression ';'
+        { $$ = create_set_statement(); }
+    | reference SUBEQ expression ';'
+        { $$ = create_set_statement(); }
+    | reference MULEQ expression ';'
+        { $$ = create_set_statement(); }
+    | reference DIVEQ expression ';'
+        { $$ = create_set_statement(); }
+    | reference MODEQ expression ';'
+        { $$ = create_set_statement(); }
+    | reference ANDEQ expression ';'
+        { $$ = create_set_statement(); }
+    | reference OREQ expression ';'
+        { $$ = create_set_statement(); }
+    | reference XOREQ expression ';'
+        { $$ = create_set_statement(); }
+    | reference LSHEQ expression ';'
+        { $$ = create_set_statement(); }
+    | reference RSHEQ expression ';'
+        { $$ = create_set_statement(); }
+    | reference INC ';'
+        { $$ = create_set_statement(); }
+    | reference DEC ';'
+        { $$ = create_set_statement(); }
+    ;
+
+switch_statement
+    : SWITCH expression '{'
           cases
           DEFAULT ':'
               statements
       '}'
-      {
-          add_array_element($$, as_statement(create_switch_statement()));
-      }
-    | statements SWITCH expression '{'
+        { $$ = create_switch_statement(); }
+    | SWITCH expression '{'
           cases
       '}'
-      {
-          add_array_element($$, as_statement(create_switch_statement()));
-      }
-    | statements WHILE conditions '{'
-          statements
-      '}'
-      {
-          add_array_element($$, as_statement(create_while_statement($3, /* conditions */
-                                                                    $5  /* do_statements */)));
-      }
-    | statements assignment
-      {
-          add_array_element($$, as_statement(create_set_statement()));
-      }
-    | statements definition
-      {
-          add_array_element($$, as_statement(create_define_statement()));
-      }
-    | statements call_statement
-      {
-          add_array_element($$, as_statement(create_call_statement()));
-      }
-    | statements '{' statements '}'
-    |
-      {
-          $$ = NULL;
-      }
+        { $$ = create_switch_statement(); }
     ;
 
 cases
@@ -296,20 +451,9 @@ case
     : CASE expression ':' statements
     ;
 
-assignment
-    : references '=' expressions ';'
-    | reference ADDEQ expression ';'
-    | reference SUBEQ expression ';'
-    | reference MULEQ expression ';'
-    | reference DIVEQ expression ';'
-    | reference MODEQ expression ';'
-    | reference ANDEQ expression ';'
-    | reference OREQ expression ';'
-    | reference XOREQ expression ';'
-    | reference LSHEQ expression ';'
-    | reference RSHEQ expression ';'
-    | reference INC ';'
-    | reference DEC ';'
+while_statement
+    : WHILE conditions compound_statement
+        { $$ = create_while_statement($2, $3); }
     ;
 
 references
@@ -323,77 +467,6 @@ reference
     | reference '[' expression ']'
     | reference '.' IDENTIFIER
     | IDENTIFIER
-    ;
-
-
-enum_items
-    : enum_items ',' enum_item
-    | enum_items ','
-    | enum_item
-    |
-    ;
-
-enum_item
-    : IDENTIFIER '=' expression
-    | IDENTIFIER
-    ;
-
-struct_items
-    : struct_items struct_item
-    |
-    ;
-
-struct_item
-    : MIXIN deferred_type IDENTIFIER ':' expression '=' expression ';'
-    | MIXIN deferred_type IDENTIFIER ':' expression ';'
-    | MIXIN type IDENTIFIER ':' expression '=' expression ';'
-    | MIXIN type IDENTIFIER ':' expression ';'
-    | MIXIN deferred_type IDENTIFIER '=' expression ';'
-    | MIXIN deferred_type IDENTIFIER ';'
-    | MIXIN type IDENTIFIER '=' expression ';'
-    | MIXIN type IDENTIFIER ';'
-    | MIXIN STRUCT '{'
-          struct_items
-      '}'
-    | ENUM IDENTIFIER '{'
-          enum_items
-      '}'
-    | ENUM '{'
-          enum_items
-      '}'
-    | STRUCT IDENTIFIER '{'
-          struct_items
-      '}'
-    | STRUCT '{'
-          struct_items
-      '}'
-    | deferred_type declarators ';'
-    | type declarators ';'
-    ;
-
-parameters
-    : parameters ',' parameter
-    | parameter
-    ;
-
-parameter
-    : type indirection IDENTIFIER brackets
-    ;
-
-call_statement
-    : IDENTIFIER arguments ';'
-    | IDENTIFIER ';'
-    ;
-
-arguments
-    : arguments ',' argument
-    | argument
-    ;
-
-argument
-    : IDENTIFIER '=' expression
-    | expression
-    | ETC
     ;
 
 conditions

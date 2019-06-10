@@ -120,6 +120,13 @@ static void compile_continue_statement(Continue_Statement *statement) {
     }
 }
 
+static void compile_declare_statement(Declare_Statement *statement) {
+    if (statement) {
+        indent();
+        printf("[declare];");
+    }
+}
+
 static void compile_defer_statement(Defer_Statement *statement) {
     if (statement) {
         indent();
@@ -207,6 +214,9 @@ static void compile_statement(Statement *statement) {
                 break;
             case CONTINUE_STATEMENT:
                 compile_continue_statement(&statement->as.continue_statement);
+                break;
+            case DECLARE_STATEMENT:
+                compile_declare_statement(&statement->as.declare_statement);
                 break;
             case DEFER_STATEMENT:
                 compile_defer_statement(&statement->as.defer_statement);

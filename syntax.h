@@ -59,6 +59,9 @@ typedef struct {
 } Continue_Statement;
 
 typedef struct {
+} Declare_Statement;
+
+typedef struct {
     Call_Statement *call_statement;
 } Defer_Statement;
 
@@ -93,6 +96,7 @@ typedef enum {
     BREAK_STATEMENT,
     CALL_STATEMENT,
     CONTINUE_STATEMENT,
+    DECLARE_STATEMENT,
     DEFER_STATEMENT,
     DEFINE_STATEMENT,
     FINISH_STATEMENT,
@@ -109,6 +113,7 @@ struct Statement {
         Break_Statement break_statement;
         Call_Statement call_statement;
         Continue_Statement continue_statement;
+        Declare_Statement declare_statement;
         Defer_Statement defer_statement;
         Define_Statement define_statement;
         Finish_Statement finish_statement;
@@ -140,6 +145,9 @@ create_call_statement(void);
 
 Continue_Statement *
 create_continue_statement(const char *identifier);
+
+Declare_Statement *
+create_declare_statement(void);
 
 Defer_Statement *
 create_defer_statement(void);

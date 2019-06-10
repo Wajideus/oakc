@@ -12,23 +12,20 @@ color brightmagenta "\<(break|continue|finish|goto|return)\>"
 
 # Type Declarations.
 color brightwhite "\<[A-Z_a-z][0-9A-Z_a-z]*\>"
-color brightblue "\<(bool|char|dict|enum|float|proc|str|struct|uint|union||var)\>"
-color brightblue "\<(const|extern|fixto|mixin|ref|typedef|via)\>"
+color brightblue "\<(enum|proc|struct|union)\>"
+color brightblue "\<(bool|char|dict|float|str|u?int)\>"
+color brightblue "\<(const|extern|mixin|ref|typedef)\>"
 
 # Constants.
 #color white "\<[A-Z][0-9A-Z_]+\>"
 color white "\<(FALSE|TRUE|NULL)\>"
 color white "\<[A-Za-z][0-9A-Z_a-z]*\>!"
-color white "\<(len(gth_?of)?|num(ber_?of)?|size_?of|type_?of)\>"
+color white "\<(lengthOf|sizeOf|typeOf)\>"
 
 # String Literals.
 #color brightyellow ""([^"]|\\")*"" "'[^']'"
 color brightyellow ""([^"]|\\")*"" "'([^']|\\')*'"
 color brightyellow start="\"\"\"" end="\"\"\""
-
-# Generics.
-color yellow "<[^[:blank:]=]*>"
-color brightyellow "\$\<[A-Z_a-z][0-9A-Z_a-z]*\>"
 
 # Comments.
 color brightgreen "//.*"

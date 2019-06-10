@@ -5,7 +5,7 @@ const Actor actors[16];
 Component *component;
 
 typedef struct ActorInstance {
-    mixin int actor : actors[3];
+    mixin int actor;
 }
 
 
