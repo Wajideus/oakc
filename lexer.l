@@ -61,7 +61,6 @@ extern    { update_position(); return EXTERN; }
 FALSE     { update_position(); return KFALSE; }
 finish    { update_position(); return FINISH; }
 float     { update_position(); return FLOAT; }
-fixto     { update_position(); return FIXTO; }
 if        { update_position(); return IF; }
 int       { update_position(); return INT; }
 lengthof  { update_position(); return LENGTHOF; }
@@ -78,7 +77,6 @@ switch    { update_position(); return SWITCH; }
 TRUE      { update_position(); return KTRUE; }
 typedef   { update_position(); return TYPEDEF; }
 uint      { update_position(); return UINT; }
-via       { update_position(); return VIA; }
 void      { update_position(); return VOID; }
 while     { update_position(); return WHILE; }
 {IDENTIFIER}  {

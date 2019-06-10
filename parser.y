@@ -29,9 +29,9 @@ extern void compile_statements(Statement **);
 %token DDEFINE DELSE DEND DIF DINCLUDE
 %token CASE DEFAULT DEFER DO ELSE IF SWITCH WHILE
 %token BREAK CONTINUE FINISH RETURN
-%token ENUM PROC STRUCT TYPEDEF UNION
+%token ENUM PROC STRUCT UNION
 %token BOOL CHAR DICT FLOAT INT STR UINT VOID
-%token CONST EXTERN FIXTO MIXIN REF VIA
+%token CONST EXTERN MIXIN REF TYPEDEF
 %token <identifier> IDENTIFIER
 %token <type_name> TYPE_NAME
 %token NUMBER
@@ -169,7 +169,9 @@ declarators
     ;
 
 declarator
-    : name '=' expression
+    : name ':' expression '=' expression
+    | name ':' expression
+    | name '=' expression
     | name
     ;
 
@@ -342,8 +344,10 @@ struct_items
     ;
 
 struct_item
-    : MIXIN FIXTO reference VIA IDENTIFIER IDENTIFIER ';'
-    | MIXIN FIXTO reference VIA type_name IDENTIFIER ';'
+    : MIXIN deferred_type IDENTIFIER ':' expression '=' expression ';'
+    | MIXIN deferred_type IDENTIFIER ':' expression ';'
+    | MIXIN type IDENTIFIER ':' expression '=' expression ';'
+    | MIXIN type IDENTIFIER ':' expression ';'
     | MIXIN deferred_type IDENTIFIER '=' expression ';'
     | MIXIN deferred_type IDENTIFIER ';'
     | MIXIN type IDENTIFIER '=' expression ';'
@@ -351,7 +355,6 @@ struct_item
     | MIXIN STRUCT '{'
           struct_items
       '}'
-    | FIXTO reference VIA type_name IDENTIFIER ';'
     | ENUM IDENTIFIER '{'
           enum_items
       '}'
