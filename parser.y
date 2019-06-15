@@ -275,12 +275,15 @@ parameters
     ;
 
 parameter
-    : declaration_specifier declarator
+    : deferred_declaration_specifier declarator
     ;
 
 statements
-    : /* empty */
-        { $$ = NULL; }
+    :            statement
+        {
+            $$ = NULL;
+            add_array_element($$, $1);
+        }
     | statements statement
         { add_array_element($$, $2); }
     ;
@@ -342,6 +345,8 @@ argument
 compound_statement
     : '{' statements '}'
         { $$ = $2; }
+    | '{'            '}'
+        { $$ = NULL; }
     ;
 
 continue_statement
@@ -458,11 +463,21 @@ references
     ;
 
 reference
+    :           direct_reference
+    | asterisks direct_reference
+    ;
+
+direct_reference
     : '(' expression ')' '[' expression ']'
     | '(' expression ')' '.' IDENTIFIER
-    | reference '[' expression ']'
-    | reference '.' IDENTIFIER
+    | direct_reference '[' expression ']'
+    | direct_reference '.' IDENTIFIER
     | IDENTIFIER
+    ;
+
+asterisks
+    :           '*'
+    | asterisks '*'
     ;
 
 conditions
@@ -557,15 +572,15 @@ term
     | value
     ;
 
-// TODO: ! & * operators
+// TODO: ! * operators
 
 value
     : LENGTHOF '(' reference ')'
     | NUMBEROF '(' reference ')'
-    | SIZEOF '(' reference ')'
-    | value '(' arguments ')'
-    | value '(' ')'
-    | value '[' expression ']'
+    | SIZEOF   '(' reference ')'
+    | value    '(' arguments ')'
+    | value    '(' ')'
+    | value    '[' expression ']'
     | value '.' IDENTIFIER
     | '(' conditions ')'
     | IDENTIFIER

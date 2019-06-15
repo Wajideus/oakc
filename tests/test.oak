@@ -30,6 +30,11 @@ typedef struct Door {
 
 proc main(str args[]) {
 
+    // Pointers are dereferenced by default.
+    const int *x = 5;
+    x += 3;                   // so this results in x == 8
+    *x++;                     // and this is a pointer increment
+
     // If you assign a returned 'proc' to an identifier or use it as an
     // argument in a function call, you create an asynchronous process.
     proc copying = copyFile("file.txt", "directory/");
