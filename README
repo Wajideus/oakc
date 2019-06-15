@@ -73,21 +73,11 @@ the C programming language.
     This helps to prevent bugs caused by confusing operator precedence.
 
 
-9. There are references.
-
-        ref Monster monster = alloc(Monster);
-    
+9.  Pointers are dereferenced by default, so there's no need for references.
     This allows you to use operators on an object without having to
-    dereference it. Conversion between lvalues and references can be done
-    implicitly, which reduces noise in the program. These references, unlike
-    those in C++, are nullable.
-
-        typedef ref struct Entity {
-            Vec3 position;
-        }
-
-    One particular idiom is the definition of a reference type as shown above.
-    This removes the need to type "ref" everywhere.
+    dereference it. Conversion between lvalues and lvalue pointers can be
+    done implicitly, which reduces noise in the program. Lvalue pointers,
+    unlike references in C++, are nullable.
 
 
 10. Multiple comma-separated includes can by done at once.
