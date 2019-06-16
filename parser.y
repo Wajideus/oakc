@@ -41,7 +41,7 @@ extern void compile_statements(Statement **);
 }
 
 %token DDEFINE DELSE DEND DIF INCLUDE
-%token CASE DEFAULT DEFER DO ELSE END IF OF SWITCH THEN WHILE
+%token CASE DEFAULT DEFER DO ELSE IF SWITCH WHILE
 %token BREAK CONTINUE FINISH RETURN
 %token ENUM FUNC PROC STRUCT UNION
 %token BOOL CHAR DICT FLOAT INT STR UINT VOID
@@ -58,7 +58,6 @@ extern void compile_statements(Statement **);
 %token LSHEQ RSHEQ ANDEQ OREQ XOREQ 
 %token INC DEC
 %token ETC
-%token NEWLINE
 
 %type <statements> statements
 %type <conditions> conditions
@@ -87,7 +86,6 @@ extern void compile_statements(Statement **);
 
 translation_unit
     : /* empty */
-    | translation_unit NEWLINE
     | translation_unit directive
     | translation_unit anonymous_enum
     | translation_unit anonymous_struct
@@ -95,75 +93,63 @@ translation_unit
     | translation_unit enum_declaration
     | translation_unit struct_declaration
     | translation_unit func_declaration
-    | translation_unit const_declaration
     | translation_unit var_declaration
     ;
 
 directive
-    : INCLUDE strings
+    : INCLUDE strings ';'
     ;
 
 strings
-    : strings ',' optional_whitespace STRING
+    : strings ',' STRING
     | STRING
     ;
 
-optional_whitespace
-    : /* empty */
-    | optional_whitespace NEWLINE
-    ;
-
 anonymous_enum
-    : ENUM NEWLINE enum_items END NEWLINE
-    | ENUM NEWLINE            END NEWLINE
+    : ENUM '{' enum_items '}'
+    | ENUM '{'            '}'
     ;
 
 anonymous_struct
-    : STRUCT NEWLINE struct_items END NEWLINE
-    | STRUCT NEWLINE              END NEWLINE
+    : STRUCT '{' struct_items '}'
+    | STRUCT '{'              '}'
     ;
 
 type_definition
     : TYPEDEF enum_declaration
     | TYPEDEF struct_declaration
-    | TYPEDEF FUNC IDENTIFIER type_specifier NEWLINE
-    | TYPEDEF IDENTIFIER type_specifier NEWLINE
+    | TYPEDEF FUNC IDENTIFIER type_specifier ';'
+    | TYPEDEF      IDENTIFIER type_specifier ';'
     ;
 
 enum_declaration
-    : ENUM IDENTIFIER NEWLINE enum_items END NEWLINE
-    | ENUM IDENTIFIER NEWLINE            END NEWLINE
+    : ENUM IDENTIFIER '{' enum_items '}'
+    | ENUM IDENTIFIER '{'            '}'
     ;
 
 enum_items
-    :            NEWLINE
-    |                    IDENTIFIER '=' expression
+    :                    IDENTIFIER '=' expression
     |                    IDENTIFIER
-    | enum_items NEWLINE IDENTIFIER '=' expression
-    | enum_items NEWLINE IDENTIFIER
-    | enum_items NEWLINE
     | enum_items ','     IDENTIFIER '=' expression
     | enum_items ','     IDENTIFIER
     | enum_items ','
     ;
 
 struct_declaration
-    : STRUCT IDENTIFIER NEWLINE struct_items END NEWLINE
-    | STRUCT IDENTIFIER NEWLINE              END NEWLINE
+    : STRUCT IDENTIFIER '{' struct_items '}'
+    | STRUCT IDENTIFIER '{'              '}'
     ;
 
 struct_items
-    :              NEWLINE
-    | struct_items NEWLINE
-    |              struct_item
+    :              struct_item
     | struct_items struct_item
     ;
 
 struct_item
-    : MIXIN     IDENTIFIER type_specifier NEWLINE
-    | MIXIN VAR IDENTIFIER type_specifier NEWLINE
-    |       VAR typed_declaration         NEWLINE
-    |           typed_declaration         NEWLINE
+    : MIXIN     IDENTIFIER type_specifier ';'
+    | MIXIN VAR IDENTIFIER type_specifier ';'
+    |       VAR typed_declaration         ';'
+    |           typed_declaration         ';'
     | anonymous_enum
     | anonymous_struct
     | enum_declaration
@@ -172,43 +158,37 @@ struct_item
     ;
 
 func_declaration
-    : EXTERN       FUNC IDENTIFIER function_type_specifier NEWLINE
-    |              FUNC IDENTIFIER function_type_specifier NEWLINE
+    : EXTERN       FUNC IDENTIFIER function_type_specifier ';'
+    |              FUNC IDENTIFIER function_type_specifier '{'
                        statements
-                   END NEWLINE
+                   '}'
       {
           compile_statements($5);
       }
     ;
 
 parameters
-    : parameters ',' optional_whitespace parameter
+    : parameters ',' parameter
     | parameter
     ;
 
 parameter
-    : CONST unmodified_parameter
-    |       unmodified_parameter
+    : unmodified_parameter
     | ETC
     ;
 
 unmodified_parameter
     : declarator type_specifier ETC
     | declarator type_specifier
-    | declarator '*'            ETC
+    | declarator indirection    ETC
+    | declarator indirection
     | declarator                ETC
-    | declarator '*'
     | declarator
     ;
 
-const_declaration
-    : EXTERN CONST declarators type_specifier NEWLINE
-    |        CONST declaration                NEWLINE
-    ;
-
 var_declaration
-    : EXTERN VAR declarators type_specifier NEWLINE
-    |        VAR declaration                NEWLINE
+    : EXTERN VAR declarators type_specifier ';'
+    |        VAR declaration                ';'
     ;
 
 declaration
@@ -223,23 +203,33 @@ typed_declaration
     ;
 
 function_type_specifier
-    : '(' parameters ')' type_specifier
+    : '(' parameters ')' fields type_specifier
+    | '(' parameters ')'        type_specifier
     | '(' parameters ')'
-    | '('            ')' type_specifier
+    | '('            ')' fields type_specifier
+    | '('            ')'        type_specifier
     | '('            ')'
     ;
 
 declarators
-    : declarators ',' optional_whitespace declarator
-    |                                     declarator
+    : declarators ',' declarator
+    |                 declarator
     ;
 
 declarator
     : IDENTIFIER
-    | declarator '(' parameters ')'
-    | declarator '('            ')'
-    | declarator '[' expression ']'
-    | declarator '['            ']'
+    | IDENTIFIER fields
+    ;
+
+fields
+    :        '(' parameters ')'
+    |        '('            ')'
+    |        '[' expression ']'
+    |        '['            ']'
+    | fields '(' parameters ')'
+    | fields '('            ')'
+    | fields '[' expression ']'
+    | fields '['            ']'
     ;
 
 type_specifier
@@ -268,16 +258,11 @@ indirection
     ;
 
 statements
-    :            NEWLINE
-        {
-            $$ = NULL;
-        }
-    |            statement
+    :            statement
         {
             $$ = NULL;
             add_array_element($$, $1);
         }
-    | statements NEWLINE
     | statements statement
         { add_array_element($$, $2); }
     ;
@@ -310,21 +295,21 @@ statement
     ;
 
 break_statement
-    : BREAK IDENTIFIER NEWLINE
+    : BREAK IDENTIFIER ';'
         { $$ = create_break_statement($2); }
-    | BREAK NEWLINE
+    | BREAK ';'
         { $$ = create_break_statement(NULL); }
     ;
 
 call_statement
-    : IDENTIFIER arguments NEWLINE
+    : IDENTIFIER arguments ';'
         { $$ = create_call_statement(); }
-    | IDENTIFIER NEWLINE
+    | IDENTIFIER ';'
         { $$ = create_call_statement(); }
     ;
 
 arguments
-    : arguments ',' optional_whitespace argument
+    : arguments ',' argument
     | argument
     ;
 
@@ -335,9 +320,9 @@ argument
     ;
 
 continue_statement
-    : CONTINUE IDENTIFIER NEWLINE
+    : CONTINUE IDENTIFIER ';'
         { $$ = create_continue_statement($2); }
-    | CONTINUE NEWLINE
+    | CONTINUE ';'
         { $$ = create_continue_statement(NULL); }
     ;
 
@@ -347,8 +332,6 @@ declare_statement
     | struct_declaration
         { $$ = create_declare_statement(); }
     | func_declaration
-        { $$ = create_declare_statement(); }
-    | const_declaration
         { $$ = create_declare_statement(); }
     | var_declaration
         { $$ = create_declare_statement(); }
@@ -369,69 +352,70 @@ define_statement
     ;
 
 finish_statement
-    : FINISH references NEWLINE
+    : FINISH references ';'
         { $$ = create_finish_statement(NULL); }
     ;
 
 if_statement
-    : IF conditions THEN NEWLINE
+    : IF conditions '{'
           statements
-      ELSE NEWLINE
+      '}'
+      ELSE '{'
           statements
-      END NEWLINE
-        { $$ = create_if_statement($2, $5); }
-    | IF conditions THEN NEWLINE
+      '}'
+        { $$ = create_if_statement($2, $4); }
+    | IF conditions '{'
           statements
-      END NEWLINE
-        { $$ = create_if_statement($2, $5); }
+      '}'
+        { $$ = create_if_statement($2, $4); }
     ;
 
 return_statement
-    : RETURN expressions NEWLINE
+    : RETURN expressions ';'
         { $$ = create_return_statement($2); }
-    | RETURN NEWLINE
+    | RETURN ';'
         { $$ = create_return_statement(NULL); }
     ;
 
 set_statement
-    : references '=' expressions NEWLINE
+    : references '=' expressions ';'
         { $$ = create_set_statement(); }
-    | reference ADDEQ expression NEWLINE
+    | reference ADDEQ expression ';'
         { $$ = create_set_statement(); }
-    | reference SUBEQ expression NEWLINE
+    | reference SUBEQ expression ';'
         { $$ = create_set_statement(); }
-    | reference MULEQ expression NEWLINE
+    | reference MULEQ expression ';'
         { $$ = create_set_statement(); }
-    | reference DIVEQ expression NEWLINE
+    | reference DIVEQ expression ';'
         { $$ = create_set_statement(); }
-    | reference MODEQ expression NEWLINE
+    | reference MODEQ expression ';'
         { $$ = create_set_statement(); }
-    | reference ANDEQ expression NEWLINE
+    | reference ANDEQ expression ';'
         { $$ = create_set_statement(); }
-    | reference OREQ expression NEWLINE
+    | reference OREQ expression ';'
         { $$ = create_set_statement(); }
-    | reference XOREQ expression NEWLINE
+    | reference XOREQ expression ';'
         { $$ = create_set_statement(); }
-    | reference LSHEQ expression NEWLINE
+    | reference LSHEQ expression ';'
         { $$ = create_set_statement(); }
-    | reference RSHEQ expression NEWLINE
+    | reference RSHEQ expression ';'
         { $$ = create_set_statement(); }
-    | reference INC NEWLINE
+    | reference INC ';'
         { $$ = create_set_statement(); }
-    | reference DEC NEWLINE
+    | reference DEC ';'
         { $$ = create_set_statement(); }
     ;
 
 switch_statement
-    : SWITCH expression OF NEWLINE
+    : SWITCH expression '{'
           cases
-          DEFAULT NEWLINE
+          DEFAULT ':'
               statements
-      END NEWLINE
+      '}'
         { $$ = create_switch_statement(); }
-    | SWITCH expression OF NEWLINE
+    | SWITCH expression '{'
           cases
-      END NEWLINE
+      '}'
         { $$ = create_switch_statement(); }
     ;
 
@@ -441,14 +425,14 @@ cases
     ;
 
 case
-    : CASE expression NEWLINE statements
+    : CASE expression ':' statements
     ;
 
 while_statement
-    : WHILE conditions DO NEWLINE
+    : WHILE conditions '{'
           statements
-      END NEWLINE
-        { $$ = create_while_statement($2, $5); }
+      '}'
+        { $$ = create_while_statement($2, $4); }
     ;
 
 references

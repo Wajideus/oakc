@@ -30,7 +30,7 @@
          "name": "storage.type.oak"
 		},
       "control-keywords": {
-         "match": "\\b(case|default|defer|do|else|end|for|if|of|switch|while)\\b",
+         "match": "\\b(case|default|defer|do|else|for|if|switch|while)\\b",
          "name": "keyword.control.oak"
       },
       "branch-keywords": {
@@ -38,7 +38,7 @@
          "name": "keyword.control.branch.oak"
       },
       "operator-keywords": {
-         "match": "\\b(lengthof|numberof|offsetof|sizeof)\\b",
+         "match": "\\b(lengthOf|offsetOf|sizeOf)\\b",
          "name": "keyword.operator.sizeof.oak"
       },
       "builtin-constants": {
@@ -54,7 +54,7 @@
          "name": "entity.name.type.oak"
       },
       "modifiers": {
-         "match": "\\b(const|extern|mixin|typedef|var)\\b",
+         "match": "\\b(extern|mixin|typedef|var)\\b",
          "name": "storage.modifier.oak"
 		},
 		"strings": {
@@ -174,11 +174,11 @@
 							"name": "meta.toc-list.banner.line.c"
 						}
 					},
-					"match": "^:: =(\\s*.*?)\\s*=\\s*$\\n?",
+					"match": "^// =(\\s*.*?)\\s*=\\s*$\\n?",
 					"name": "comment.line.banner.cpp"
 				},
 				{
-					"begin": "(^[ \\t]+)?(?=::)",
+					"begin": "(^[ \\t]+)?(?=//)",
 					"beginCaptures": {
 						"1": {
 							"name": "punctuation.whitespace.comment.leading.cpp"
@@ -187,7 +187,7 @@
 					"end": "(?!\\G)",
 					"patterns": [
 						{
-							"begin": "::",
+							"begin": "//",
 							"beginCaptures": {
 								"0": {
 									"name": "punctuation.definition.comment.cpp"

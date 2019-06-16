@@ -89,8 +89,8 @@ the C programming language.
 
 11. There's a built-in length-prefixed immutable "str" string type.
 
-        const text Str = "Hello World"
-        print text
+        const text Str = "Hello World";
+        print text;
 
     This allows you to compare strings with '==' and '!=', and boosts the
     performance of string operations by utilizing string interning, length
@@ -100,7 +100,7 @@ the C programming language.
 
 12. There's a built-in unsigned int type called "uint".
 
-        const x UInt = 5
+        const x UInt = 5;
     
     Typing "unsigned" is obnoxious.
 
@@ -111,10 +111,10 @@ the C programming language.
 14. There's a built-in dictionary type called "Dict", which is implemented as
     a chained scatter table.
 
-        var person Dict
-        person.name = "bob"
-        person.age = 26
-        print person["age"]
+        var person Dict;
+        person.name = "bob";
+        person.age = 26;
+        print person["age"];
 
     A chained scatter table is extremely efficient and is a fundamental tool
     for solving a large class of problems.
@@ -127,12 +127,12 @@ the C programming language.
 
 16. There's support for type inference.
 
-        var file = fopen("test.txt", "rb")
+        var file = fopen("test.txt", "rb");
 
 17. There are 'defer' statements, which are executed in reverse order when
     the function ends.
 
-        defer fclose(file)
+        defer fclose(file);
         ...
 
     This allows recovering from multiple error vectors via state reversal.
@@ -140,10 +140,10 @@ the C programming language.
 
 18. There's support for tuples.
 
-        x, y = 2, 4
-        if x, y == 2, 4 then
+        x, y = 2, 4;
+        if x, y == 2, 4 {
             ...
-        end
+        }
     
     This is particularly useful for things like swapping operations.
 
@@ -163,11 +163,11 @@ the C programming language.
 23. There's support for breaking and continuing labelled loops.
 
         copying:
-          while line = readline(file) do
-              if line.isEmpty then
-                  break copying
-              end
-          end
+          while line = readline(file) {
+              if line.isEmpty {
+                  break copying;
+              }
+          }
 
 
 24. You can change the location of the stack.
@@ -179,25 +179,25 @@ the C programming language.
 
 26. There's a "Proc" (process) type for coroutines.
 
-        func dostuff() Proc
+        func dostuff() Proc {
             ...
-        end
+        }
 
-        func main(args[] Str) Int
-            var doingstuff Proc = dostuff()
-            while doingstuff do
+        func main(args[] Str) Int {
+            var doingstuff Proc = dostuff();
+            while doingstuff {
                 ...
-            end
-        end
+            }
+        }
 
 
 27. A cast from "T()" to "T" is done implicitly via function call.
 
-        func text() Str
-            return "Hello World!"
-        end
+        func text() Str {
+            return "Hello World!";
+        }
 
-        print text
+        print text;
     
     This just removes some line noise.
 

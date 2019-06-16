@@ -27,15 +27,14 @@ STRING \"(\\.|[^\\"])*\"
 
 %%
 
-::.*    update_position();
+\/\/.* update_position();
 
 [ \t]  update_position();
 
-;|\n\r?|\r\n? {
+\n\r?|\r\n? {
     line_number++;
     column_number = 1;
     last_token_length = 0;
-    return NEWLINE;
 }
 
 \#[ \t]*define  { update_position(); return DDEFINE; }
@@ -49,14 +48,13 @@ Bool      { update_position(); return BOOL; }
 break     { update_position(); return BREAK; }
 case      { update_position(); return CASE; }
 Char      { update_position(); return CHAR; }
-const     { update_position(); return CONST; }
+Const     { update_position(); return CONST; }
 continue  { update_position(); return CONTINUE; }
 default   { update_position(); return DEFAULT; }
 defer     { update_position(); return DEFER; }
 do        { update_position(); return DO; }
 Dict      { update_position(); return DICT; }
 else      { update_position(); return ELSE; }
-end       { update_position(); return END; }
 enum      { update_position(); return ENUM; }
 extern    { update_position(); return EXTERN; }
 FALSE     { update_position(); return KFALSE; }
@@ -69,14 +67,12 @@ lengthof  { update_position(); return LENGTHOF; }
 mixin     { update_position(); return MIXIN; }
 NULL      { update_position(); return KNULL; }
 numberof  { update_position(); return NUMBEROF; }
-of        { update_position(); return OF; }
 Proc      { update_position(); return PROC; }
 return    { update_position(); return RETURN; }
 sizeof    { update_position(); return SIZEOF; }
 Str       { update_position(); return STR; }
 struct    { update_position(); return STRUCT; }
 switch    { update_position(); return SWITCH; }
-then      { update_position(); return THEN; }
 TRUE      { update_position(); return KTRUE; }
 typedef   { update_position(); return TYPEDEF; }
 UInt      { update_position(); return UINT; }

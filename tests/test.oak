@@ -1,39 +1,39 @@
-include "stdio", "stdlib"
+include "stdio", "stdlib";
 
 
-:: The syntax for arrays may seem a little weird at first, but they're
-:: designed this way to be consistent with the syntax of functions.
+// The syntax for arrays may seem a little weird at first, but they're
+// designed this way to be consistent with the syntax of functions.
 
-typedef struct Entity
-   components[] *Component
-   status Status
-end
+typedef struct Entity {
+   components[] *Component;
+   status Status;
+}
 
-typedef struct Door
-   mixin entity Entity
-   openness Float
-end
+typedef struct Door {
+   mixin entity Entity;
+   openness Float;
+}
 
-:: Below is how you would import functions from C.
+// Below is how you would import functions from C.
 
-extern func printf(const format *Char, ...)
+extern func printf(format *Const Char, ...);
 extern func qsort(ptr*, count Size, size Size,
-                  comp(const val*, const val*) Int)
+                  comp(val *Const, val *Const) Int);
 
-func main(args[] Str) Int
+func main(args[] Str) Int {
 
-   :: Pointers are dereferenced by default.
-   const x, y *Int = 5, 7
-   x += 3                    :: so this results in x == 8
-   *x++                      :: and this is a pointer increment
+   // Pointers are dereferenced by default.
+   var x, y *Const Int = 5, 7;
+   x += 3;                   // so this results in x == 8
+   *x++;                     // and this is a pointer increment
 
-   :: Pointers implicitly cast to values of the same type.
-   printf "%i, %i\n", x, y
+   // Pointers implicitly cast to values of the same type.
+   printf "%i, %i\n", x, y;
 
-   switch x of
-      case 7
-         break
-      default
-         break
-   end
-end
+   switch x {
+      case 7:
+         break;
+      default:
+         break;
+   }
+}
