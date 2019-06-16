@@ -44,7 +44,7 @@ extern void compile_statements(Statement **);
 %token CASE DEFAULT DEFER DO ELSE IF SWITCH WHILE
 %token BREAK CONTINUE FINISH RETURN
 %token ENUM FUNC PROC STRUCT UNION
-%token BOOL CHAR DICT FLOAT INT STR UINT VOID
+%token BOOL CHAR DICT FLOAT INT SIZE STR TYPE UINT VOID
 %token CONST EXTERN MIXIN TYPEDEF VAR
 %token <identifier> IDENTIFIER
 %token NUMBER
@@ -245,7 +245,9 @@ direct_type_specifier
     | FLOAT
     | INT
     | PROC
+    | SIZE
     | STR
+    | TYPE
     | UINT
     | VOID
     ;

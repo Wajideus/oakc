@@ -18,7 +18,7 @@ typedef struct Door {
 
 extern func printf(format *Const Char, ...);
 extern func qsort(ptr*, count Size, size Size,
-                  comp(val *Const, val *Const) Int);
+                  comp(val *Const Void, val *Const Void) Int);
 
 func main(args[] Str) Int {
 

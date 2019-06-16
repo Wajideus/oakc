@@ -5,12 +5,12 @@ the C programming language.
 1.  Function calls do not require parentheses unless you're capturing their
     return value.
 
-        puts "Hello World!"
+        puts "Hello World!";
 
 
 2.  Expressions are not statements.
 
-        die
+        die;
 
     This allows functions with no arguments to be called without parentheses.
 
@@ -20,7 +20,7 @@ the C programming language.
         var entity Entity = {
             position = Vec3.ZERO
         }
-        move entity, toLocation="hello world\n"
+        move entity, toLocation="hello world\n";
     
     This allows for struct initialiizers and function calls to support the
     assignment of a field or parameter by name.
@@ -29,30 +29,30 @@ the C programming language.
 4.  Conditions are not expressions, and must be wrapped in parentheses if they
     aren't part of an "if" or "while" statement.
 
-        if printStuff == TRUE then
-            printf "%b\n", (this != that)
-        end
+        if printStuff == TRUE {
+            printf "%b\n", (this != that);
+        }
 
     This is one of the requirements for supporting tuples in the language.
 
 
 5.  All type definitions begin with "typedef".
 
-        typedef struct Entity
-            var position Vec3
-        end
+        typedef struct Entity {
+            var position Vec3;
+        }
     
     This just makes the language more consistent.
 
 
 6.  There's a "mixin" modifier.
 
-        typedef struct Monster
-            mixin entity Entity
-            aggro Float
-        end
+        typedef struct Monster {
+            mixin entity Entity;
+            aggro Float;
+        }
 
-        var monster Monster
+        var monster Monster;
         monster.position = Vec3.ZERO   :: monster.entity.position
     
     This saves a lot of typing and allows for structural polymorphism.
@@ -60,8 +60,8 @@ the C programming language.
 
 7.  The '.' operator works on pointers.
 
-        var monster *Monster = alloc(Monster)
-        monster.aggro = 0.75
+        var monster *Monster = alloc(Monster);
+        monster.aggro = 0.75;
         
     This makes working with deep hierarchies less painful.
 
@@ -82,7 +82,7 @@ the C programming language.
 
 10. Multiple comma-separated includes can by done at once.
 
-        include "stdio", "stdlib"
+        include "stdio", "stdlib";
 
     This just saves some typing.
 
@@ -173,8 +173,8 @@ the C programming language.
 24. You can change the location of the stack.
 
 
-25. The 'func' keyword is used for function declarations in order to prevent
-    them from being reassigned and make them easily greppable.
+25. The 'func' keyword is a modifier used for function declarations in order
+    to prevent them from being reassigned and make them easily greppable.
 
 
 26. There's a "Proc" (process) type for coroutines.
