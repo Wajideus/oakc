@@ -53,7 +53,7 @@ the C programming language.
         }
 
         var monster Monster;
-        monster.position = Vec3.ZERO   :: monster.entity.position
+        monster.position = Vec3.ZERO;   // monster.entity.position
     
     This saves a lot of typing and allows for structural polymorphism.
 
