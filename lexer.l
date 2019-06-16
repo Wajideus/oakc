@@ -29,7 +29,7 @@ STRING \"(\\.|[^\\"])*\"
 
 %%
 
-\/\/.* update_position();
+;.*    update_position();
 
 [ \t]  update_position();
 
@@ -37,13 +37,15 @@ STRING \"(\\.|[^\\"])*\"
     line_number++;
     column_number = 1;
     last_token_length = 0;
+    return NEWLINE;
 }
 
 \#[ \t]*define  { update_position(); return DDEFINE; }
 \#[ \t]*else    { update_position(); return DELSE; }
 \#[ \t]*end     { update_position(); return DEND; }
 \#[ \t]*if      { update_position(); return DIF; }
-\#[ \t]*include { update_position(); return DINCLUDE; }
+
+include   { update_position(); return INCLUDE; }
 
 bool      { update_position(); return BOOL; }
 break     { update_position(); return BREAK; }
@@ -56,6 +58,7 @@ defer     { update_position(); return DEFER; }
 do        { update_position(); return DO; }
 dict      { update_position(); return DICT; }
 else      { update_position(); return ELSE; }
+end       { update_position(); return END; }
 enum      { update_position(); return ENUM; }
 extern    { update_position(); return EXTERN; }
 FALSE     { update_position(); return KFALSE; }
@@ -67,13 +70,14 @@ lengthof  { update_position(); return LENGTHOF; }
 mixin     { update_position(); return MIXIN; }
 NULL      { update_position(); return KNULL; }
 numberof  { update_position(); return NUMBEROF; }
+of        { update_position(); return OF; }
 proc      { update_position(); return PROC; }
-ref       { update_position(); return REF; }
 return    { update_position(); return RETURN; }
 sizeof    { update_position(); return SIZEOF; }
 str       { update_position(); return STR; }
 struct    { update_position(); return STRUCT; }
 switch    { update_position(); return SWITCH; }
+then      { update_position(); return THEN; }
 TRUE      { update_position(); return KTRUE; }
 typedef   { update_position(); return TYPEDEF; }
 uint      { update_position(); return UINT; }

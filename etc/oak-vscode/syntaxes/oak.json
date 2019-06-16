@@ -18,7 +18,7 @@
    ],
    "repository": {
 		"directive-keywords": {
-			"match": "#(include)",
+			"match": "\\b(include)\\b",
 			"captures": {
 				"1": {
 					"name": "meta.preprocessor.keyword"
@@ -30,7 +30,7 @@
          "name": "storage.type.oak"
 		},
       "control-keywords": {
-         "match": "\\b(case|default|defer|do|else|for|if|of|switch|while)\\b",
+         "match": "\\b(case|default|defer|do|else|end|for|if|of|switch|while)\\b",
          "name": "keyword.control.oak"
       },
       "branch-keywords": {
@@ -174,11 +174,11 @@
 							"name": "meta.toc-list.banner.line.c"
 						}
 					},
-					"match": "^// =(\\s*.*?)\\s*=\\s*$\\n?",
+					"match": "^; =(\\s*.*?)\\s*=\\s*$\\n?",
 					"name": "comment.line.banner.cpp"
 				},
 				{
-					"begin": "(^[ \\t]+)?(?=//)",
+					"begin": "(^[ \\t]+)?(?=;)",
 					"beginCaptures": {
 						"1": {
 							"name": "punctuation.whitespace.comment.leading.cpp"
@@ -187,7 +187,7 @@
 					"end": "(?!\\G)",
 					"patterns": [
 						{
-							"begin": "//",
+							"begin": ";",
 							"beginCaptures": {
 								"0": {
 									"name": "punctuation.definition.comment.cpp"

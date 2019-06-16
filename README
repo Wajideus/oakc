@@ -19,8 +19,8 @@ the C programming language.
 
         Entity entity = {
             position = Vec3.ZERO
-        };
-        move entity, toLocation="hello world\n";
+        }
+        move entity, toLocation="hello world\n"
     
     This allows for struct initialiizers and function calls to support the
     assignment of a field or parameter by name.
@@ -29,40 +29,40 @@ the C programming language.
 4.  Conditions are not expressions, and must be wrapped in parentheses if they
     aren't part of an "if" or "while" statement.
 
-        if printStuff == TRUE {
-            printf "%b\n", (this != that);
-        }
+        if printStuff == TRUE then
+            printf "%b\n", (this != that)
+        end
 
     This is one of the requirements for supporting tuples in the language.
 
 
 5.  All type definitions begin with "typedef".
 
-        typedef struct Entity {
-            Vec3 position;
-        }
+        typedef struct Entity
+            Vec3 position
+        end
     
     This just makes the language more consistent.
 
 
 6.  There's a "mixin" modifier.
 
-        typedef struct Monster {
-            mixin Entity entity;
-            float aggro;
-        }
+        typedef struct Monster
+            mixin Entity entity
+            float aggro
+        end
 
-        Monster monster;
-        monster.position = Vec3.ZERO;   // monster.entity.position
+        Monster monster
+        monster.position = Vec3.ZERO   ; monster.entity.position
     
     This saves a lot of typing and allows for structural polymorphism.
 
 
 7.  The '.' operator works on pointers.
 
-        Monster* monster = alloc(Monster);
-        monster.aggro = 0.75;
-    
+        Monster *monster = alloc(Monster)
+        monster.aggro = 0.75
+        
     This makes working with deep hierarchies less painful.
 
 
@@ -82,15 +82,15 @@ the C programming language.
 
 10. Multiple comma-separated includes can by done at once.
 
-        #include "stdio", "stdlib"
+        include "stdio", "stdlib"
 
     This just saves some typing.
 
 
-11. There is a built-in length-prefixed immutable "str" string type.
+11. There's a built-in length-prefixed immutable "str" string type.
 
-        str text = "Hello World";
-        print text;
+        str text = "Hello World"
+        print text
 
     This allows you to compare strings with '==' and '!=', and boosts the
     performance of string operations by utilizing string interning, length
@@ -100,7 +100,7 @@ the C programming language.
 
 12. There's a built-in unsigned int type called "uint".
 
-        uint x = 5;
+        uint x = 5
     
     Typing "unsigned" is obnoxious.
 
@@ -111,10 +111,10 @@ the C programming language.
 14. There's a built-in dictionary type called "dict", which is implemented as
     a chained scatter table.
 
-        dict person;
-        person.name = "bob";
-        person.age = 26;
-        print person["age"];
+        dict person
+        person.name = "bob"
+        person.age = 26
+        print person["age"]
 
     A chained scatter table is extremely efficient and is a fundamental tool
     for solving a large class of problems.
@@ -129,8 +129,8 @@ the C programming language.
 16. There are 'defer' statements, which are executed in reverse order when
     the function ends.
 
-        FILE *f = fopen("test.txt", "rb");
-        defer fclose(f);
+        FILE *f = fopen("test.txt", "rb")
+        defer fclose(f)
         ...
 
     This allows recovering from multiple error vectors via state reversal.
@@ -139,9 +139,9 @@ the C programming language.
 17. There's support for tuples.
 
         x, y = 2, 4
-        if x, y == 2, 4 {
+        if x, y == 2, 4 then
             ...
-        }
+        end
     
     This is particularly useful for things like swapping operations.
 
@@ -160,11 +160,11 @@ the C programming language.
 
 22. There's support for breaking and continuing labelled loops.
 
-        copying: while line = readline(file) {
-            if line.isEmpty {
-                break copying;
-            }
-        }
+        copying: while line = readline(file) do
+            if line.isEmpty then
+                break copying
+            end
+        end
 
 
 23. You can change the location of the stack.
@@ -172,25 +172,25 @@ the C programming language.
 
 24. There's a "proc" (process) type for coroutines.
 
-        proc dostuff() {
+        proc dostuff() do
             ...
-        }
+        end
 
-        int main(str args[]) {
-            proc doingstuff = dostuff();
-            while doingstuff {
+        int main(str args[]) do
+            proc doingstuff = dostuff()
+            while doingstuff do
                 ...
-            }
-        }
+            end
+        end
 
 
 25. A cast from "T(*)()" to "T" is done implicitly via function call.
 
-        str text() {
-            return "Hello World!";
-        }
+        str text() do
+            return "Hello World!"
+        end
 
-        print text;
+        print text
     
     This just removes some line noise.
 
