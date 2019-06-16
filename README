@@ -179,11 +179,11 @@ the C programming language.
 
 26. There's a "Proc" (process) type for coroutines.
 
-        func dostuff Proc()
+        func dostuff() Proc
             ...
         end
 
-        func main Int(args Str[])
+        func main(args[] Str) Int
             var doingstuff Proc = dostuff()
             while doingstuff do
                 ...
@@ -193,7 +193,7 @@ the C programming language.
 
 27. A cast from "T()" to "T" is done implicitly via function call.
 
-        func text Str()
+        func text() Str
             return "Hello World!"
         end
 

@@ -1,6 +1,9 @@
 include "stdio", "stdlib"
 
 
+:: The syntax for arrays may seem a little weird at first, but they're
+:: designed this way to be consistent with the syntax of functions.
+
 typedef struct Entity
    components[] *Component
    status Status

@@ -193,38 +193,33 @@ parameter
     ;
 
 unmodified_parameter
-    : IDENTIFIER type_specifier ETC
-    | IDENTIFIER type_specifier
-    | IDENTIFIER '*'            ETC
-    | IDENTIFIER                ETC
-    | IDENTIFIER '*'
-    | IDENTIFIER
+    : declarator type_specifier ETC
+    | declarator type_specifier
+    | declarator '*'            ETC
+    | declarator                ETC
+    | declarator '*'
+    | declarator
     ;
 
 const_declaration
-    : EXTERN CONST identifiers type_specifier NEWLINE
+    : EXTERN CONST declarators type_specifier NEWLINE
     |        CONST declaration                NEWLINE
     ;
 
 var_declaration
-    : EXTERN VAR identifiers type_specifier NEWLINE
+    : EXTERN VAR declarators type_specifier NEWLINE
     |        VAR declaration                NEWLINE
     ;
 
 declaration
     : typed_declaration
-    | identifiers '=' expressions
-    | identifiers
+    | declarators '=' expressions
+    | declarators
     ;
 
 typed_declaration
-    : identifiers type_specifier '=' expressions
-    | identifiers type_specifier
-    ;
-
-identifiers
-    :                                     IDENTIFIER
-    | identifiers ',' optional_whitespace IDENTIFIER
+    : declarators type_specifier '=' expressions
+    | declarators type_specifier
     ;
 
 function_type_specifier
@@ -232,6 +227,19 @@ function_type_specifier
     | '(' parameters ')'
     | '('            ')' type_specifier
     | '('            ')'
+    ;
+
+declarators
+    : declarators ',' optional_whitespace declarator
+    |                                     declarator
+    ;
+
+declarator
+    : IDENTIFIER
+    | declarator '(' parameters ')'
+    | declarator '('            ')'
+    | declarator '[' expression ']'
+    | declarator '['            ']'
     ;
 
 type_specifier
@@ -255,16 +263,8 @@ direct_type_specifier
 indirection
     :             '*'
     |             '*' CONST
-    |             '[' expression ']'
-    |             '['            ']'
-    |             '(' parameters ')'
-    |             '('            ')'
     | indirection '*'
     | indirection '*' CONST
-    | indirection '[' expression ']'
-    | indirection '['            ']'
-    | indirection '(' parameters ')'
-    | indirection '('            ')'
     ;
 
 statements
