@@ -26,7 +26,7 @@
 			}
 		},
       "declaration-keywords": {
-		 "match": "\\b(bool|char|dict|enum|float|func|int|proc|str|struct|uint|void)\\b",
+		 "match": "\\b(enum|func|struct|union)\\b",
          "name": "storage.type.oak"
 		},
       "control-keywords": {
@@ -42,7 +42,7 @@
          "name": "keyword.operator.sizeof.oak"
       },
       "builtin-constants": {
-         "match": "\\b(false|null|true)\\b",
+         "match": "\\b(FALSE|TRUE|NULL)\\b",
          "name": "constant.language.oak"
       },
 		"regular-constants": {
@@ -54,7 +54,7 @@
          "name": "entity.name.type.oak"
       },
       "modifiers": {
-         "match": "\\b(const|extern|fixto|mixin|ref|typedef|var|via)\\b",
+         "match": "\\b(const|extern|mixin|typedef|var)\\b",
          "name": "storage.modifier.oak"
 		},
 		"strings": {

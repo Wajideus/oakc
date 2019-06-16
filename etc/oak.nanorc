@@ -12,10 +12,9 @@ color brightblue "\<((for)?each|in)\>"
 color brightmagenta "\<(break|continue|finish|goto|return)\>"
 
 # Type Declarations.
-color brightwhite "\<[A-Z_a-z][0-9A-Z_a-z]*\>"
-color brightblue "\<(enum|proc|struct|union)\>"
-color brightblue "\<(bool|char|dict|float|str|u?int)\>"
-color brightblue "\<(const|extern|mixin|ref|typedef)\>"
+color brightwhite "\<([A-Z_a-z][0-9A-Z_a-z]*)\>"
+color brightblue "\<(enum|func|struct|union)\>"
+color brightblue "\<(const|extern|mixin|typedef)\>"
 
 # Constants.
 #color white "\<[A-Z][0-9A-Z_]+\>"

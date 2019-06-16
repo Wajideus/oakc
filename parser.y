@@ -160,10 +160,10 @@ struct_items
     ;
 
 struct_item
-    : MIXIN     IDENTIFIER  type_specifier NEWLINE
-    | MIXIN VAR IDENTIFIER  type_specifier NEWLINE
-    |       VAR identifiers type_specifier NEWLINE
-    |           identifiers type_specifier NEWLINE
+    : MIXIN     IDENTIFIER type_specifier NEWLINE
+    | MIXIN VAR IDENTIFIER type_specifier NEWLINE
+    |       VAR typed_declaration         NEWLINE
+    |           typed_declaration         NEWLINE
     | anonymous_enum
     | anonymous_struct
     | enum_declaration
@@ -194,21 +194,37 @@ parameters
     ;
 
 parameter
-    : IDENTIFIER type_specifier
+    : CONST unmodified_parameter
+    |       unmodified_parameter
+    | ETC
+    ;
+
+unmodified_parameter
+    : IDENTIFIER type_specifier ETC
+    | IDENTIFIER type_specifier
+    | IDENTIFIER                ETC
+    | IDENTIFIER
     ;
 
 const_declaration
     : EXTERN CONST identifiers type_specifier NEWLINE
-    |        CONST identifiers type_specifier '=' expressions NEWLINE
-    |        CONST identifiers type_specifier                 NEWLINE
-    |        CONST identifiers                '=' expressions NEWLINE
+    |        CONST declaration                NEWLINE
     ;
 
 var_declaration
     : EXTERN VAR identifiers type_specifier NEWLINE
-    |        VAR identifiers type_specifier '=' expressions NEWLINE
-    |        VAR identifiers type_specifier                 NEWLINE
-    |        VAR identifiers                '=' expressions NEWLINE
+    |        VAR declaration                NEWLINE
+    ;
+
+declaration
+    : typed_declaration
+    | identifiers '=' expressions
+    | identifiers
+    ;
+
+typed_declaration
+    : identifiers type_specifier '=' expressions
+    | identifiers type_specifier
     ;
 
 identifiers
