@@ -182,9 +182,8 @@ func_declaration
     ;
 
 func_type_signature
-    : '(' parameters ')' type_specifiers
+    : type_specifier
     | '(' parameters ')'
-    | '('            ')' type_specifiers
     | '('            ')'
     ;
 
@@ -202,7 +201,9 @@ parameter
 unmodified_parameter
     : IDENTIFIER type_specifier ETC
     | IDENTIFIER type_specifier
+    | IDENTIFIER '*'            ETC
     | IDENTIFIER                ETC
+    | IDENTIFIER '*'
     | IDENTIFIER
     ;
 
@@ -230,11 +231,6 @@ typed_declaration
 identifiers
     :                                     IDENTIFIER
     | identifiers ',' optional_whitespace IDENTIFIER
-    ;
-
-type_specifiers
-    :                     type_specifier
-    | type_specifiers ',' type_specifier
     ;
 
 type_specifier

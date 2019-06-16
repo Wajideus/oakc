@@ -1,19 +1,6 @@
 include "stdio", "stdlib"
 
 
-const actors Actor[16]
-var component *Component
-
-typedef struct ActorInstance
-    mixin actor *Actor
-end
-
-
-typedef enum Status
-    DEAD = 1 << 2
-    BURNED, FROZEN
-end
-
 typedef struct Entity
     components *Component[]
     status Status
@@ -24,37 +11,20 @@ typedef struct Door
     openness Float
 end
 
-; 'Proc' is not a special keyword for functions, it's a typename, short for
-; 'process', which is used for concurrent programming.
+; Below is how you would import functions from C.
 
-func main (args Str[]) Proc
+extern func printf(const format *Char, ...)
+extern func qsort(ptr*, count Size, size Size, comp Int(const val*, const val*))
+
+func main Int(args Str[])
 
     ; Pointers are dereferenced by default.
     const x, y *Int = 5, 7
     x += 3                    ; so this results in x == 8
     *x++                      ; and this is a pointer increment
 
-    ; If you assign a returned 'proc' to an identifier or use it as an
-    ; argument in a function call, you create an asynchronous process.
-    var copying Proc = copyFile("file.txt", "directory/")
-
-    ; An async proc isn't guaranteed to start until we transfer control to it
-    ; at least once.
-    continue copying
-
-    ; You can force an async proc to complete by using a 'finish' statement.
-    finish copying
-
-    ; Checking on the state of a proc causes a transfer of control to it.
-    while copying do
-        print "still copying\n"
-    end
-
-    ; If you don't 'catch' a returned proc, it gets executed sequentially.
-    copyFile "file2.txt", toLocation = "directory/"
-
-    ; You can hoist a proc by returning it.
-    return copyFile("file3.txt", "directory/")
+    ; Pointers implicitly cast to values of the same type.
+    printf "%i, %i\n", x, y
 
     switch x of
         case 7
