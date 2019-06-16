@@ -91,12 +91,12 @@ translation_unit
     | translation_unit directive
     | translation_unit anonymous_enum
     | translation_unit anonymous_struct
+    | translation_unit type_definition
     | translation_unit enum_declaration
     | translation_unit struct_declaration
     | translation_unit func_declaration
     | translation_unit const_declaration
     | translation_unit var_declaration
-    | translation_unit type_definition
     ;
 
 directive
@@ -121,6 +121,13 @@ anonymous_enum
 anonymous_struct
     : STRUCT NEWLINE struct_items END NEWLINE
     | STRUCT NEWLINE              END NEWLINE
+    ;
+
+type_definition
+    : TYPEDEF enum_declaration
+    | TYPEDEF struct_declaration
+    | TYPEDEF FUNC IDENTIFIER func_type_signature NEWLINE
+    | TYPEDEF IDENTIFIER type_specifier NEWLINE
     ;
 
 enum_declaration
@@ -153,8 +160,10 @@ struct_items
     ;
 
 struct_item
-    : MIXIN VAR IDENTIFIER type_specifier NEWLINE
-    | VAR identifiers type_specifier NEWLINE
+    : MIXIN     IDENTIFIER  type_specifier NEWLINE
+    | MIXIN VAR IDENTIFIER  type_specifier NEWLINE
+    |       VAR identifiers type_specifier NEWLINE
+    |           identifiers type_specifier NEWLINE
     | anonymous_enum
     | anonymous_struct
     | enum_declaration
@@ -163,34 +172,20 @@ struct_item
     ;
 
 func_declaration
-    : EXTERN FUNC IDENTIFIER '(' parameters ')' ':' type_specifiers NEWLINE
-    | EXTERN FUNC IDENTIFIER '('            ')' ':' type_specifiers NEWLINE
-    | EXTERN FUNC IDENTIFIER '(' parameters ')'                     NEWLINE
-    | EXTERN FUNC IDENTIFIER '('            ')'                     NEWLINE
-    |        FUNC IDENTIFIER '(' parameters ')' ':' type_specifiers NEWLINE
+    : EXTERN FUNC IDENTIFIER func_type_signature NEWLINE
+    |        FUNC IDENTIFIER func_type_signature NEWLINE
                  statements
              END NEWLINE
       {
-          compile_statements($9);
+          compile_statements($5);
       }
-    |        FUNC IDENTIFIER '('            ')' ':' type_specifiers NEWLINE
-                 statements
-             END NEWLINE
-      {
-          compile_statements($8);
-      }
-    |        FUNC IDENTIFIER '(' parameters ')'                     NEWLINE
-                 statements
-             END NEWLINE
-      {
-          compile_statements($7);
-      }
-    |        FUNC IDENTIFIER '('            ')'                     NEWLINE
-                 statements
-             END NEWLINE
-      {
-          compile_statements($6);
-      }
+    ;
+
+func_type_signature
+    : '(' parameters ')' type_specifiers
+    | '(' parameters ')'
+    | '('            ')' type_specifiers
+    | '('            ')'
     ;
 
 parameters
@@ -253,12 +248,6 @@ indirection
     |             '*' CONST
     | indirection '*'
     | indirection '*' CONST
-    ;
-
-type_definition
-    : TYPEDEF enum_declaration
-    | TYPEDEF struct_declaration
-    | TYPEDEF IDENTIFIER type_specifier NEWLINE
     ;
 
 statements

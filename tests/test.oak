@@ -5,7 +5,7 @@ const actors Actor[16]
 var component *Component
 
 typedef struct ActorInstance
-    mixin var actor *Actor
+    mixin actor *Actor
 end
 
 
@@ -15,19 +15,19 @@ typedef enum Status
 end
 
 typedef struct Entity
-    var components *Component[]
-    var status Status
+    components *Component[]
+    status Status
 end
 
 typedef struct Door
-    mixin var entity Entity
-    var openness Float
+    mixin entity Entity
+    openness Float
 end
 
-; 'proc' is not a special keyword for functions, it's a typename, short for
+; 'Proc' is not a special keyword for functions, it's a typename, short for
 ; 'process', which is used for concurrent programming.
 
-func main(args Str[]): Int
+func main (args Str[]) Proc
 
     ; Pointers are dereferenced by default.
     const x, y *Int = 5, 7

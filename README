@@ -48,8 +48,8 @@ the C programming language.
 6.  There's a "mixin" modifier.
 
         typedef struct Monster
-            mixin var entity Entity
-            var aggro Float
+            mixin entity Entity
+            aggro Float
         end
 
         var monster Monster
@@ -173,11 +173,11 @@ the C programming language.
 
 24. There's a "Proc" (process) type for coroutines.
 
-        func dostuff(): Proc
+        func dostuff() Proc
             ...
         end
 
-        func main(args Str[]): Int
+        func main(args Str[]) Int
             var doingstuff Proc = dostuff()
             while doingstuff do
                 ...
@@ -187,7 +187,7 @@ the C programming language.
 
 25. A cast from "T(*)()" to "T" is done implicitly via function call.
 
-        func text(): Str
+        func text() Str
             return "Hello World!"
         end
 
