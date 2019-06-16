@@ -27,11 +27,11 @@ STRING \"(\\.|[^\\"])*\"
 
 %%
 
-;.*    update_position();
+::.*    update_position();
 
 [ \t]  update_position();
 
-\n\r?|\r\n? {
+;|\n\r?|\r\n? {
     line_number++;
     column_number = 1;
     last_token_length = 0;

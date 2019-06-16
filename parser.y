@@ -126,7 +126,7 @@ anonymous_struct
 type_definition
     : TYPEDEF enum_declaration
     | TYPEDEF struct_declaration
-    | TYPEDEF FUNC IDENTIFIER func_type_signature NEWLINE
+    | TYPEDEF FUNC IDENTIFIER type_specifier NEWLINE
     | TYPEDEF IDENTIFIER type_specifier NEWLINE
     ;
 
@@ -172,23 +172,17 @@ struct_item
     ;
 
 func_declaration
-    : EXTERN FUNC IDENTIFIER func_type_signature NEWLINE
-    |        FUNC IDENTIFIER func_type_signature NEWLINE
-                 statements
-             END NEWLINE
+    : EXTERN       FUNC IDENTIFIER function_type_specifier NEWLINE
+    |              FUNC IDENTIFIER function_type_specifier NEWLINE
+                       statements
+                   END NEWLINE
       {
           compile_statements($5);
       }
     ;
 
-func_type_signature
-    : type_specifier
-    | '(' parameters ')'
-    | '('            ')'
-    ;
-
 parameters
-    : parameters ',' parameter
+    : parameters ',' optional_whitespace parameter
     | parameter
     ;
 
@@ -233,6 +227,13 @@ identifiers
     | identifiers ',' optional_whitespace IDENTIFIER
     ;
 
+function_type_specifier
+    : '(' parameters ')' type_specifier
+    | '(' parameters ')'
+    | '('            ')' type_specifier
+    | '('            ')'
+    ;
+
 type_specifier
     :             direct_type_specifier
     | indirection direct_type_specifier
@@ -249,17 +250,21 @@ direct_type_specifier
     | STR
     | UINT
     | VOID
-    | direct_type_specifier '[' expression ']'
-    | direct_type_specifier '['            ']'
-    | direct_type_specifier '(' parameters ')'
-    | direct_type_specifier '('            ')'
     ;
 
 indirection
     :             '*'
     |             '*' CONST
+    |             '[' expression ']'
+    |             '['            ']'
+    |             '(' parameters ')'
+    |             '('            ')'
     | indirection '*'
     | indirection '*' CONST
+    | indirection '[' expression ']'
+    | indirection '['            ']'
+    | indirection '(' parameters ')'
+    | indirection '('            ')'
     ;
 
 statements

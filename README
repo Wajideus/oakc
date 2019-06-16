@@ -53,7 +53,7 @@ the C programming language.
         end
 
         var monster Monster
-        monster.position = Vec3.ZERO   ; monster.entity.position
+        monster.position = Vec3.ZERO   :: monster.entity.position
     
     This saves a lot of typing and allows for structural polymorphism.
 
@@ -175,27 +175,6 @@ the C programming language.
 
 25. The 'func' keyword is used for function declarations in order to prevent
     them from being reassigned and make them easily greppable.
-    
-        const foo Int()
-
-        func foo Int()
-            ...
-        end
-    
-    In the first example, 'foo' is a function that returns a const Int. You
-    could change which function is actually being called by doing:
-
-        *foo = bar
-    
-    In the second example, 'foo' is a function that returns a Int. It's
-    illegal to try to change which function is actually called.
-
-        const func foo Int()
-            ...
-        end
-    
-    The above case shows how you would create a function that disallows
-    changing which function is actually called and returns a const Int.
 
 
 26. There's a "Proc" (process) type for coroutines.
