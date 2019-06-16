@@ -2,13 +2,13 @@ include "stdio", "stdlib"
 
 
 typedef struct Entity
-    components *Component[]
-    status Status
+   components *Component[]
+   status Status
 end
 
 typedef struct Door
-    mixin entity Entity
-    openness Float
+   mixin entity Entity
+   openness Float
 end
 
 ; Below is how you would import functions from C.
@@ -18,18 +18,18 @@ extern func qsort(ptr*, count Size, size Size, comp Int(const val*, const val*))
 
 func main Int(args Str[])
 
-    ; Pointers are dereferenced by default.
-    const x, y *Int = 5, 7
-    x += 3                    ; so this results in x == 8
-    *x++                      ; and this is a pointer increment
+   ; Pointers are dereferenced by default.
+   const x, y *Int = 5, 7
+   x += 3                    ; so this results in x == 8
+   *x++                      ; and this is a pointer increment
 
-    ; Pointers implicitly cast to values of the same type.
-    printf "%i, %i\n", x, y
+   ; Pointers implicitly cast to values of the same type.
+   printf "%i, %i\n", x, y
 
-    switch x of
-        case 7
-            break
-        default
-            break
-    end
+   switch x of
+      case 7
+         break
+      default
+         break
+   end
 end

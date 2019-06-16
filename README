@@ -125,18 +125,20 @@ the C programming language.
     This is necessary to support dictionaries in the language. It also gives
     the illusion of dynamic typing.
 
+16. There's support for type inference.
 
-16. There are 'defer' statements, which are executed in reverse order when
+        var file = fopen("test.txt", "rb")
+
+17. There are 'defer' statements, which are executed in reverse order when
     the function ends.
 
-        FILE *f = fopen("test.txt", "rb")
-        defer fclose(f)
+        defer fclose(file)
         ...
 
     This allows recovering from multiple error vectors via state reversal.
 
 
-17. There's support for tuples.
+18. There's support for tuples.
 
         x, y = 2, 4
         if x, y == 2, 4 then
@@ -146,19 +148,19 @@ the C programming language.
     This is particularly useful for things like swapping operations.
 
 
-18. There's support for proper modules instead of header files.
+19. There's support for proper modules instead of header files.
 
 
-19. There's support for order-independent declarations.
+20. There's support for order-independent declarations.
 
 
-20. There's support for function overloading.
+21. There's support for function overloading.
 
 
-21. There's support for initial struct values.
+22. There's support for initial struct values.
 
 
-22. There's support for breaking and continuing labelled loops.
+23. There's support for breaking and continuing labelled loops.
 
         copying:
           while line = readline(file) do
@@ -168,16 +170,41 @@ the C programming language.
           end
 
 
-23. You can change the location of the stack.
+24. You can change the location of the stack.
 
 
-24. There's a "Proc" (process) type for coroutines.
+25. The 'func' keyword is used for function declarations in order to prevent
+    them from being reassigned and make them easily greppable.
+    
+        const foo Int()
 
-        func dostuff() Proc
+        func foo Int()
+            ...
+        end
+    
+    In the first example, 'foo' is a function that returns a const Int. You
+    could change which function is actually being called by doing:
+
+        *foo = bar
+    
+    In the second example, 'foo' is a function that returns a Int. It's
+    illegal to try to change which function is actually called.
+
+        const func foo Int()
+            ...
+        end
+    
+    The above case shows how you would create a function that disallows
+    changing which function is actually called and returns a const Int.
+
+
+26. There's a "Proc" (process) type for coroutines.
+
+        func dostuff Proc()
             ...
         end
 
-        func main(args Str[]) Int
+        func main Int(args Str[])
             var doingstuff Proc = dostuff()
             while doingstuff do
                 ...
@@ -185,9 +212,9 @@ the C programming language.
         end
 
 
-25. A cast from "T(*)()" to "T" is done implicitly via function call.
+27. A cast from "T()" to "T" is done implicitly via function call.
 
-        func text() Str
+        func text Str()
             return "Hello World!"
         end
 
