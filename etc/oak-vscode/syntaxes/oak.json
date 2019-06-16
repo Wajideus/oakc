@@ -26,7 +26,7 @@
 			}
 		},
       "declaration-keywords": {
-		 "match": "\\b(bool|char|dict|enum|float|int|proc|str|struct|uint|void)\\b",
+		 "match": "\\b(bool|char|dict|enum|float|func|int|proc|str|struct|uint|void)\\b",
          "name": "storage.type.oak"
 		},
       "control-keywords": {
@@ -54,7 +54,7 @@
          "name": "entity.name.type.oak"
       },
       "modifiers": {
-         "match": "\\b(const|extern|fixto|mixin|ref|typedef|via)\\b",
+         "match": "\\b(const|extern|fixto|mixin|ref|typedef|var|via)\\b",
          "name": "storage.modifier.oak"
 		},
 		"strings": {

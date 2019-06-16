@@ -1,11 +1,11 @@
 include "stdio", "stdlib"
 
 
-const Actor actors[16]
-Component *component
+const actors Actor[16]
+var component *Component
 
 typedef struct ActorInstance
-    mixin int actor
+    mixin var actor *Actor
 end
 
 
@@ -15,28 +15,28 @@ typedef enum Status
 end
 
 typedef struct Entity
-    Component *component[]
-    Status status
+    var components *Component[]
+    var status Status
 end
 
 typedef struct Door
-    mixin Entity entity
-    float openness
+    mixin var entity Entity
+    var openness Float
 end
 
 ; 'proc' is not a special keyword for functions, it's a typename, short for
 ; 'process', which is used for concurrent programming.
 
-proc main(str args[]) do
+func main(args Str[]): Int
 
     ; Pointers are dereferenced by default.
-    const int *x = 5
+    const x, y *Int = 5, 7
     x += 3                    ; so this results in x == 8
     *x++                      ; and this is a pointer increment
 
     ; If you assign a returned 'proc' to an identifier or use it as an
     ; argument in a function call, you create an asynchronous process.
-    proc copying = copyFile("file.txt", "directory/")
+    var copying Proc = copyFile("file.txt", "directory/")
 
     ; An async proc isn't guaranteed to start until we transfer control to it
     ; at least once.

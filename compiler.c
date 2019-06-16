@@ -98,14 +98,13 @@ static void compile_break_statement(Break_Statement *statement) {
         if (statement->identifier) {
             printf(" %s", statement->identifier);
         }
-        putchar(';');
     }
 }
 
 static void compile_call_statement(Call_Statement *statement) {
     if (statement) {
         indent();
-        printf("[call];");
+        printf("[call]");
     }
 }
 
@@ -116,14 +115,13 @@ static void compile_continue_statement(Continue_Statement *statement) {
         if (statement->identifier) {
             printf(" %s", statement->identifier);
         }
-        putchar(';');
     }
 }
 
 static void compile_declare_statement(Declare_Statement *statement) {
     if (statement) {
         indent();
-        printf("[declare];");
+        printf("[declare]");
     }
 }
 
@@ -138,14 +136,14 @@ static void compile_defer_statement(Defer_Statement *statement) {
 static void compile_define_statement(Define_Statement *statement) {
     if (statement) {
         indent();
-        printf("[define];");
+        printf("[define]");
     }
 }
 
 static void compile_finish_statement(Finish_Statement *statement) {
     if (statement) {
         indent();
-        printf("finish %s;", statement->identifier);
+        printf("finish %s", statement->identifier);
     }
 }
 
@@ -154,12 +152,12 @@ static void compile_if_statement(If_Statement *statement) {
         indent();
         printf("if ");
         compile_conditions(statement->conditions);
-        printf(" {\n");
+        printf(" then\n");
         indent_level++;
         compile_statements(statement->then_statements);
         indent_level--;
         indent();
-        printf("}");
+        printf("end");
     }
 }
 
@@ -171,21 +169,20 @@ static void compile_return_statement(Return_Statement *statement) {
             putchar(' ');
             compile_expressions(statement->expressions);
         }
-        putchar(';');
     }
 }
 
 static void compile_set_statement(Set_Statement *statement) {
     if (statement) {
         indent();
-        printf("[set];");
+        printf("[set]");
     }
 }
 
 static void compile_switch_statement(Switch_Statement *statement) {
     if (statement) {
         indent();
-        printf("[switch];");
+        printf("[switch]");
     }
 }
 
@@ -194,12 +191,12 @@ static void compile_while_statement(While_Statement *statement) {
         indent();
         printf("while ");
         compile_conditions(statement->conditions);
-        printf(" {\n");
+        printf(" do\n");
         indent_level++;
         compile_statements(statement->do_statements);
         indent_level--;
         indent();
-        printf("}");
+        printf("end");
     }
 }
 

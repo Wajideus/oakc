@@ -14,8 +14,7 @@ extern void compile_statements(Statement **);
 %}
 
 %union {
-    const char *identifier,
-               *type_name;
+    const char *identifier;
 
     Statement **statements;
     Condition **conditions;
@@ -44,11 +43,10 @@ extern void compile_statements(Statement **);
 %token DDEFINE DELSE DEND DIF INCLUDE
 %token CASE DEFAULT DEFER DO ELSE END IF OF SWITCH THEN WHILE
 %token BREAK CONTINUE FINISH RETURN
-%token ENUM PROC STRUCT UNION
+%token ENUM FUNC PROC STRUCT UNION
 %token BOOL CHAR DICT FLOAT INT STR UINT VOID
-%token CONST EXTERN MIXIN TYPEDEF
+%token CONST EXTERN MIXIN TYPEDEF VAR
 %token <identifier> IDENTIFIER
-%token <type_name> TYPE_NAME
 %token NUMBER
 %token STRING
 %token KFALSE KNULL KTRUE
@@ -95,9 +93,10 @@ translation_unit
     | translation_unit anonymous_struct
     | translation_unit enum_declaration
     | translation_unit struct_declaration
-    | translation_unit deferred_declaration
-    | translation_unit deferred_type_definition
-    | translation_unit deferred_function_definition
+    | translation_unit func_declaration
+    | translation_unit const_declaration
+    | translation_unit var_declaration
+    | translation_unit type_definition
     ;
 
 directive
@@ -136,8 +135,8 @@ enum_items
     | enum_items NEWLINE IDENTIFIER '=' expression
     | enum_items NEWLINE IDENTIFIER
     | enum_items NEWLINE
-    | enum_items ',' IDENTIFIER '=' expression
-    | enum_items ',' IDENTIFIER
+    | enum_items ','     IDENTIFIER '=' expression
+    | enum_items ','     IDENTIFIER
     | enum_items ','
     ;
 
@@ -148,88 +147,92 @@ struct_declaration
 
 struct_items
     :              NEWLINE
-    |              anonymous_enum
-    |              anonymous_struct
-    |              enum_declaration
-    |              struct_declaration
-    |              deferred_declaration
     | struct_items NEWLINE
-    | struct_items anonymous_enum
-    | struct_items anonymous_struct
-    | struct_items enum_declaration
-    | struct_items struct_declaration
-    | struct_items deferred_declaration
+    |              struct_item
+    | struct_items struct_item
     ;
 
-deferred_declaration
-    : deferred_declaration_specifier declarators NEWLINE
+struct_item
+    : MIXIN VAR IDENTIFIER type_specifier NEWLINE
+    | VAR identifiers type_specifier NEWLINE
+    | anonymous_enum
+    | anonymous_struct
+    | enum_declaration
+    | struct_declaration
+    | func_declaration
     ;
 
-deferred_declaration_specifier
-    : storage_class_specifier type_qualifiers deferred_type_specifier
-    | storage_class_specifier                 deferred_type_specifier
-    |                         type_qualifiers deferred_type_specifier
-    |                                         deferred_type_specifier
+func_declaration
+    : EXTERN FUNC IDENTIFIER '(' parameters ')' ':' type_specifiers NEWLINE
+    | EXTERN FUNC IDENTIFIER '('            ')' ':' type_specifiers NEWLINE
+    | EXTERN FUNC IDENTIFIER '(' parameters ')'                     NEWLINE
+    | EXTERN FUNC IDENTIFIER '('            ')'                     NEWLINE
+    |        FUNC IDENTIFIER '(' parameters ')' ':' type_specifiers NEWLINE
+                 statements
+             END NEWLINE
+      {
+          compile_statements($9);
+      }
+    |        FUNC IDENTIFIER '('            ')' ':' type_specifiers NEWLINE
+                 statements
+             END NEWLINE
+      {
+          compile_statements($8);
+      }
+    |        FUNC IDENTIFIER '(' parameters ')'                     NEWLINE
+                 statements
+             END NEWLINE
+      {
+          compile_statements($7);
+      }
+    |        FUNC IDENTIFIER '('            ')'                     NEWLINE
+                 statements
+             END NEWLINE
+      {
+          compile_statements($6);
+      }
     ;
 
-declaration
-    : declaration_specifier declarators NEWLINE
+parameters
+    : parameters ',' parameter
+    | parameter
     ;
 
-declaration_specifier
-    : storage_class_specifier type_qualifiers type_specifier
-    | storage_class_specifier                 type_specifier
-    |                         type_qualifiers type_specifier
-    |                                         type_specifier
+parameter
+    : IDENTIFIER type_specifier
     ;
 
-declarators
-    :                 initialized_declarator
-    |                 declarator
-    | declarators ',' optional_whitespace initialized_declarator
-    | declarators ',' optional_whitespace declarator
+const_declaration
+    : EXTERN CONST identifiers type_specifier NEWLINE
+    |        CONST identifiers type_specifier '=' expressions NEWLINE
+    |        CONST identifiers type_specifier                 NEWLINE
+    |        CONST identifiers                '=' expressions NEWLINE
     ;
 
-declarator
-    :             direct_declarator
-    | indirection direct_declarator
+var_declaration
+    : EXTERN VAR identifiers type_specifier NEWLINE
+    |        VAR identifiers type_specifier '=' expressions NEWLINE
+    |        VAR identifiers type_specifier                 NEWLINE
+    |        VAR identifiers                '=' expressions NEWLINE
     ;
 
-direct_declarator
-    : IDENTIFIER
-    | '(' declarator ')'
-    | direct_declarator '[' expression ']'
-    | direct_declarator '[' ']'
-    | direct_declarator '(' parameters ')'
-    | direct_declarator '(' ')'
+identifiers
+    :                                     IDENTIFIER
+    | identifiers ',' optional_whitespace IDENTIFIER
     ;
 
-initialized_declarator
-    : declarator '=' initializer
-    ;
-
-initializer
-    : expression
-    ;
-
-indirection
-    :             '*'
-    |             '*' type_qualifiers
-    | indirection '*'
-    | indirection '*' type_qualifiers
-    ;
-
-storage_class_specifier
-    : EXTERN
-    ;
-
-deferred_type_specifier
-    : IDENTIFIER
-    | type_specifier
+type_specifiers
+    :                     type_specifier
+    | type_specifiers ',' type_specifier
     ;
 
 type_specifier
-    : TYPE_NAME
+    :             direct_type_specifier
+    | indirection direct_type_specifier
+    ;
+
+direct_type_specifier
+    : IDENTIFIER
     | BOOL
     | CHAR
     | DICT
@@ -239,53 +242,23 @@ type_specifier
     | STR
     | UINT
     | VOID
+    | direct_type_specifier '[' expression ']'
+    | direct_type_specifier '['            ']'
+    | direct_type_specifier '(' parameters ')'
+    | direct_type_specifier '('            ')'
     ;
 
-type_qualifiers
-    :                 type_qualifier
-    | type_qualifiers type_qualifier
-    ;
-
-type_qualifier
-    : CONST
-    | MIXIN
-    ;
-
-deferred_type_definition
-    : TYPEDEF enum_declaration
-    | TYPEDEF struct_declaration
-    | TYPEDEF deferred_declaration
+indirection
+    :             '*'
+    |             '*' CONST
+    | indirection '*'
+    | indirection '*' CONST
     ;
 
 type_definition
     : TYPEDEF enum_declaration
     | TYPEDEF struct_declaration
-    | TYPEDEF declaration
-    ;
-
-deferred_function_definition
-    : deferred_declaration_specifier declarator DO NEWLINE
-          statements
-      END NEWLINE
-        { compile_statements($5); }
-    ;
-
-
-function_definition
-    : declaration_specifier declarator DO NEWLINE
-          statements
-      END NEWLINE
-        { compile_statements($5); }
-    ;
-
-
-parameters
-    : parameters ',' parameter
-    | parameter
-    ;
-
-parameter
-    : deferred_declaration_specifier declarator
+    | TYPEDEF IDENTIFIER type_specifier NEWLINE
     ;
 
 statements
@@ -367,7 +340,11 @@ declare_statement
         { $$ = create_declare_statement(); }
     | struct_declaration
         { $$ = create_declare_statement(); }
-    | declaration
+    | func_declaration
+        { $$ = create_declare_statement(); }
+    | const_declaration
+        { $$ = create_declare_statement(); }
+    | var_declaration
         { $$ = create_declare_statement(); }
     ;
 
@@ -382,8 +359,6 @@ define_statement
     | anonymous_struct
         { $$ = create_define_statement(); }
     | type_definition
-        { $$ = create_define_statement(); }
-    | function_definition
         { $$ = create_define_statement(); }
     ;
 

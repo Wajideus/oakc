@@ -18,8 +18,6 @@ int column_number = 1;
 
 const char **type_names = NULL;
 
-void declare_type(const char *identifier);
-bool is_type_name(const char *identifier);
 const char *interned_string(const char *string);
 %}
 
@@ -47,54 +45,50 @@ STRING \"(\\.|[^\\"])*\"
 
 include   { update_position(); return INCLUDE; }
 
-bool      { update_position(); return BOOL; }
+Bool      { update_position(); return BOOL; }
 break     { update_position(); return BREAK; }
 case      { update_position(); return CASE; }
-char      { update_position(); return CHAR; }
+Char      { update_position(); return CHAR; }
 const     { update_position(); return CONST; }
 continue  { update_position(); return CONTINUE; }
 default   { update_position(); return DEFAULT; }
 defer     { update_position(); return DEFER; }
 do        { update_position(); return DO; }
-dict      { update_position(); return DICT; }
+Dict      { update_position(); return DICT; }
 else      { update_position(); return ELSE; }
 end       { update_position(); return END; }
 enum      { update_position(); return ENUM; }
 extern    { update_position(); return EXTERN; }
 FALSE     { update_position(); return KFALSE; }
 finish    { update_position(); return FINISH; }
-float     { update_position(); return FLOAT; }
+Float     { update_position(); return FLOAT; }
+func      { update_position(); return FUNC; }
 if        { update_position(); return IF; }
-int       { update_position(); return INT; }
+Int       { update_position(); return INT; }
 lengthof  { update_position(); return LENGTHOF; }
 mixin     { update_position(); return MIXIN; }
 NULL      { update_position(); return KNULL; }
 numberof  { update_position(); return NUMBEROF; }
 of        { update_position(); return OF; }
-proc      { update_position(); return PROC; }
+Proc      { update_position(); return PROC; }
 return    { update_position(); return RETURN; }
 sizeof    { update_position(); return SIZEOF; }
-str       { update_position(); return STR; }
+Str       { update_position(); return STR; }
 struct    { update_position(); return STRUCT; }
 switch    { update_position(); return SWITCH; }
 then      { update_position(); return THEN; }
 TRUE      { update_position(); return KTRUE; }
 typedef   { update_position(); return TYPEDEF; }
-uint      { update_position(); return UINT; }
-void      { update_position(); return VOID; }
+UInt      { update_position(); return UINT; }
+var       { update_position(); return VAR; }
+Void      { update_position(); return VOID; }
 while     { update_position(); return WHILE; }
 {IDENTIFIER}  {
     // todo: check if type or identifier
     update_position();
     const char *identifier = interned_string(yytext);
-    if (is_type_name(identifier)) {
-        yylval.type_name = identifier;
-        return TYPE_NAME;
-    }
-    else {
-        yylval.identifier = identifier;
-        return IDENTIFIER;
-    }
+    yylval.identifier = identifier;
+    return IDENTIFIER;
 }
 {NUMBER}      { update_position(); return NUMBER; }
 {STRING}      { update_position(); return STRING; }
@@ -135,22 +129,6 @@ void yyerror(const char *error) {
         }
     }
     fprintf(stderr, "\"\n");
-}
-
-
-void declare_type(const char *type_name) {
-    if (!is_type_name(type_name)) {
-        add_array_element(type_names, type_name);
-    }
-}
-
-bool is_type_name(const char *identifier) {
-    for (int i = 0; i < array_length(type_names); i++) {
-        if (type_names[i] == identifier) {
-            return true;
-        }
-    }
-    return false;
 }
 
 const char *interned_string(const char *string) {
