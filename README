@@ -17,7 +17,7 @@ the C programming language.
 
 3.  Assignments are not expressions.
 
-        Entity entity = {
+        var entity Entity = {
             position = Vec3.ZERO
         }
         move entity, toLocation="hello world\n"
@@ -39,7 +39,7 @@ the C programming language.
 5.  All type definitions begin with "typedef".
 
         typedef struct Entity
-            Vec3 position
+            var position Vec3
         end
     
     This just makes the language more consistent.
@@ -48,11 +48,11 @@ the C programming language.
 6.  There's a "mixin" modifier.
 
         typedef struct Monster
-            mixin Entity entity
-            float aggro
+            mixin var entity Entity
+            var aggro Float
         end
 
-        Monster monster
+        var monster Monster
         monster.position = Vec3.ZERO   ; monster.entity.position
     
     This saves a lot of typing and allows for structural polymorphism.
@@ -60,7 +60,7 @@ the C programming language.
 
 7.  The '.' operator works on pointers.
 
-        Monster *monster = alloc(Monster)
+        var monster *Monster = alloc(Monster)
         monster.aggro = 0.75
         
     This makes working with deep hierarchies less painful.
@@ -89,7 +89,7 @@ the C programming language.
 
 11. There's a built-in length-prefixed immutable "str" string type.
 
-        str text = "Hello World"
+        const text Str = "Hello World"
         print text
 
     This allows you to compare strings with '==' and '!=', and boosts the
@@ -100,18 +100,18 @@ the C programming language.
 
 12. There's a built-in unsigned int type called "uint".
 
-        uint x = 5
+        const x UInt = 5
     
     Typing "unsigned" is obnoxious.
 
 
-13. The "bool" type is built-in, so you don't have to include "stdbool.h".
+13. The "Bool" type is built-in, so you don't have to include "stdbool.h".
 
 
-14. There's a built-in dictionary type called "dict", which is implemented as
+14. There's a built-in dictionary type called "Dict", which is implemented as
     a chained scatter table.
 
-        dict person
+        var person Dict
         person.name = "bob"
         person.age = 26
         print person["age"]
@@ -160,24 +160,25 @@ the C programming language.
 
 22. There's support for breaking and continuing labelled loops.
 
-        copying: while line = readline(file) do
-            if line.isEmpty then
-                break copying
-            end
-        end
+        copying:
+          while line = readline(file) do
+              if line.isEmpty then
+                  break copying
+              end
+          end
 
 
 23. You can change the location of the stack.
 
 
-24. There's a "proc" (process) type for coroutines.
+24. There's a "Proc" (process) type for coroutines.
 
-        proc dostuff() do
+        func dostuff(): Proc
             ...
         end
 
-        int main(str args[]) do
-            proc doingstuff = dostuff()
+        func main(args Str[]): Int
+            var doingstuff Proc = dostuff()
             while doingstuff do
                 ...
             end
@@ -186,7 +187,7 @@ the C programming language.
 
 25. A cast from "T(*)()" to "T" is done implicitly via function call.
 
-        str text() do
+        func text(): Str
             return "Hello World!"
         end
 
