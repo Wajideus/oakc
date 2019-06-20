@@ -191,7 +191,7 @@ the C programming language.
         }
 
 
-27. A cast from "T()" to "T" is done implicitly via function call.
+27. A cast from "() T" to "T" is done implicitly via function call.
 
         func text() Str {
             return "Hello World!";

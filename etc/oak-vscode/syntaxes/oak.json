@@ -18,9 +18,9 @@
    ],
    "repository": {
 		"directive-keywords": {
-			"match": "\\b(include)\\b",
+			"match": "(^#)[ \t]*\\b(define|include)\\b",
 			"captures": {
-				"1": {
+				"2": {
 					"name": "meta.preprocessor.keyword"
 				}
 			}

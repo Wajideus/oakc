@@ -28,10 +28,6 @@ typedef struct {
 
 typedef struct {
     Type *value_type;
-} Ref_Type;
-
-typedef struct {
-    Type *value_type;
 } Ptr_Type;
 
 typedef struct {
@@ -70,7 +66,6 @@ struct Type {
         INT_TYPE,
         STR_TYPE,
         TYPE,
-        REF_TYPE,
         PTR_TYPE,
         ARRAY_TYPE,
         FUNC_TYPE,
@@ -83,7 +78,6 @@ struct Type {
         Bool_Type as_bool_type;
         Int_Type as_int_type;
         Str_Type as_str_type;
-        Ref_Type as_ref_type;
         Ptr_Type as_ptr_type;
         Array_Type as_array_type;
         Func_Type as_func_type;

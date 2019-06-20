@@ -1,4 +1,4 @@
-include "stdio", "stdlib";
+#include "stdio", "stdlib";
 
 
 // The syntax for arrays may seem a little weird at first, but they're
