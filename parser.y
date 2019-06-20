@@ -70,6 +70,7 @@ extern void compile_statements(Statement **);
 
 %type <break_statement> break_statement
 %type <call_statement> call_statement
+%type <statements> compound_statement
 %type <continue_statement> continue_statement
 %type <declare_statement> declare_statement
 %type <defer_statement> defer_statement
@@ -101,43 +102,46 @@ directive
     ;
 
 strings
-    : strings ',' STRING
-    | STRING
-    ;
-
-anonymous_enum
-    : ENUM '{' enum_items '}'
-    | ENUM '{'            '}'
-    ;
-
-anonymous_struct
-    : STRUCT '{' struct_items '}'
-    | STRUCT '{'              '}'
+    :             STRING
+    | strings ',' STRING
     ;
 
 type_definition
     : TYPEDEF enum_declaration
     | TYPEDEF struct_declaration
-    | TYPEDEF FUNC IDENTIFIER type_specifier ';'
+    | TYPEDEF FUNC IDENTIFIER function_type_specifier ';'
     | TYPEDEF      IDENTIFIER type_specifier ';'
     ;
 
+anonymous_enum
+    : ENUM '{'            '}'
+    | ENUM '{' enum_items '}'
+    ;
+
 enum_declaration
-    : ENUM IDENTIFIER '{' enum_items '}'
-    | ENUM IDENTIFIER '{'            '}'
+    : ENUM IDENTIFIER '{'            '}'
+    | ENUM IDENTIFIER '{' enum_items '}'
     ;
 
 enum_items
-    :                    IDENTIFIER '=' expression
-    |                    IDENTIFIER
-    | enum_items ','     IDENTIFIER '=' expression
-    | enum_items ','     IDENTIFIER
+    :                enum_item
+    | enum_items ',' enum_item
     | enum_items ','
     ;
 
+enum_item
+    : IDENTIFIER '=' expression
+    | IDENTIFIER
+    ;
+
+anonymous_struct
+    : STRUCT '{'              '}'
+    | STRUCT '{' struct_items '}'
+    ;
+
 struct_declaration
-    : STRUCT IDENTIFIER '{' struct_items '}'
-    | STRUCT IDENTIFIER '{'              '}'
+    : STRUCT IDENTIFIER '{'              '}'
+    | STRUCT IDENTIFIER '{' struct_items '}'
     ;
 
 struct_items
@@ -159,18 +163,15 @@ struct_item
 
 func_declaration
     : EXTERN       FUNC IDENTIFIER function_type_specifier ';'
-    |              FUNC IDENTIFIER function_type_specifier '{'
-                       statements
-                   '}'
-      {
-          compile_statements($5);
-      }
-    |              FUNC infix_function_type_specifier '{'
-                       statements
-                   '}'
-      {
-          compile_statements($4);
-      }
+    |              FUNC IDENTIFIER function_type_specifier compound_statement
+        { compile_statements($4); }
+    |              FUNC infix_function_type_specifier compound_statement
+        { compile_statements($3); }
+    ;
+
+function_type_specifier
+    : '('            ')' function_return_type
+    | '(' parameters ')' function_return_type
     ;
 
 infix_function_type_specifier
@@ -180,6 +181,7 @@ infix_function_type_specifier
 infix_operator
     : '*'
     | '/'
+    | '%'
     | '&'
     | LSH
     | RSH
@@ -193,27 +195,23 @@ infix_operator
     | GTEQ
     | '<'
     | '>'
+    | '='
     ;
 
 infix_operand
     : declarator type_specifier
     ;
 
-function_type_specifier
-    : '(' parameters ')' function_return_type
-    | '('            ')' function_return_type
-    ;
-
 function_return_type
-    : fields type_specifier
-    | fields 
-    |        type_specifier
-    | /* empty */
+    : /* empty */
+    | subscripts 
+    | subscripts type_specifier
+    |            type_specifier
     ;
 
 parameters
-    : parameters ',' parameter
-    | parameter
+    :                parameter
+    | parameters ',' parameter
     ;
 
 parameter
@@ -222,49 +220,50 @@ parameter
     ;
 
 unmodified_parameter
-    : declarator type_specifier ETC
-    | declarator type_specifier
+    : declarator                ETC
+    | declarator
     | declarator indirection    ETC
     | declarator indirection
-    | declarator                ETC
-    | declarator
+    | declarator type_specifier ETC
+    | declarator type_specifier
     ;
 
 var_declaration
-    : EXTERN VAR declarators type_specifier ';'
-    |        VAR declaration                ';'
+    :        VAR declaration                ';'
+    | EXTERN VAR declarators type_specifier ';'
     ;
 
 declaration
     : typed_declaration
-    | declarators '=' expressions
     | declarators
+    | declarators '=' expressions
     ;
 
 typed_declaration
-    : declarators type_specifier '=' expressions
-    | declarators type_specifier
+    : declarators type_specifier
+    | declarators type_specifier '=' expressions
     ;
 
 declarators
-    : declarators ',' declarator
-    |                 declarator
+    :                 declarator
+    | declarators ',' declarator
     ;
 
 declarator
     : IDENTIFIER
-    | IDENTIFIER fields
+    | IDENTIFIER subscripts
     ;
 
-fields
-    :        '(' parameters ')'
-    |        '('            ')'
-    |        '[' expression ']'
-    |        '['            ']'
-    | fields '(' parameters ')'
-    | fields '('            ')'
-    | fields '[' expression ']'
-    | fields '['            ']'
+subscripts
+    :            subscript
+    | subscripts subscript
+    ;
+
+subscript
+    : '('            ')'
+    | '(' parameters ')'
+    | '['            ']'
+    | '[' expression ']'
     ;
 
 type_specifier
@@ -309,6 +308,8 @@ statement
         { $$ = as_statement($1); }
     | call_statement
         { $$ = as_statement($1); }
+    | compound_statement
+        { $$ = NULL; }
     | continue_statement
         { $$ = as_statement($1); }
     | declare_statement
@@ -332,35 +333,42 @@ statement
     ;
 
 break_statement
-    : BREAK IDENTIFIER ';'
-        { $$ = create_break_statement($2); }
-    | BREAK ';'
+    : BREAK            ';'
         { $$ = create_break_statement(NULL); }
+    | BREAK IDENTIFIER ';'
+        { $$ = create_break_statement($2); }
     ;
 
 call_statement
-    : IDENTIFIER arguments ';'
+    : IDENTIFIER           ';'
         { $$ = create_call_statement(); }
-    | IDENTIFIER ';'
+    | IDENTIFIER arguments ';'
         { $$ = create_call_statement(); }
     ;
 
 arguments
-    : arguments ',' argument
-    | argument
+    :               argument
+    | arguments ',' argument
     ;
 
 argument
-    : IDENTIFIER '=' expression
-    | expression
-    | ETC
+    : ETC
+    |                expression
+    | IDENTIFIER '=' expression
+    ;
+
+compound_statement
+    : '{'            '}'
+        { $$ = NULL; }
+    | '{' statements '}'
+        { $$ = $2; }
     ;
 
 continue_statement
-    : CONTINUE IDENTIFIER ';'
-        { $$ = create_continue_statement($2); }
-    | CONTINUE ';'
+    : CONTINUE            ';'
         { $$ = create_continue_statement(NULL); }
+    | CONTINUE IDENTIFIER ';'
+        { $$ = create_continue_statement($2); }
     ;
 
 declare_statement
@@ -394,24 +402,17 @@ finish_statement
     ;
 
 if_statement
-    : IF conditions '{'
-          statements
-      '}'
-      ELSE '{'
-          statements
-      '}'
-        { $$ = create_if_statement($2, $4); }
-    | IF conditions '{'
-          statements
-      '}'
-        { $$ = create_if_statement($2, $4); }
+    : IF conditions compound_statement ELSE compound_statement
+        { $$ = create_if_statement($2, $3); }
+    | IF conditions compound_statement
+        { $$ = create_if_statement($2, $3); }
     ;
 
 return_statement
-    : RETURN expressions ';'
-        { $$ = create_return_statement($2); }
-    | RETURN ';'
+    : RETURN             ';'
         { $$ = create_return_statement(NULL); }
+    | RETURN expressions ';'
+        { $$ = create_return_statement($2); }
     ;
 
 set_statement
@@ -466,15 +467,13 @@ case
     ;
 
 while_statement
-    : WHILE conditions '{'
-          statements
-      '}'
-        { $$ = create_while_statement($2, $4); }
+    : WHILE conditions compound_statement
+        { $$ = create_while_statement($2, $3); }
     ;
 
 references
-    : references ',' reference
-    | reference
+    :                reference
+    | references ',' reference
     ;
 
 reference
@@ -496,38 +495,36 @@ asterisks
     ;
 
 conditions
-    : conditions OR condition
-      {
-          add_array_element($$, $3);
-      }
-    | condition
-      {
-          $$ = NULL;
-          add_array_element($$, $1);
-      }
+    :               condition
+        {
+            $$ = NULL;
+            add_array_element($$, $1);
+        }
+    | conditions OR condition
+        { add_array_element($$, $3); }
     ;
 
 condition
     : comparisons
-      {
-          $$ = create_condition($1);
-      }
+        { $$ = create_condition($1); }
     ;
 
 comparisons
-    : comparisons AND comparison
-      {
-          add_array_element($$, $3);
-      }
-    | comparison
-      {
-          $$ = NULL;
-          add_array_element($$, $1);
-      }
+    :                 comparison
+        {
+            $$ = NULL;
+            add_array_element($$, $1);
+        }
+    | comparisons AND comparison
+        { add_array_element($$, $3); }
     ;
 
 comparison
-    : expressions EQ expressions
+    :                expressions
+      {
+          $$ = create_comparison(NO_COMPARISON, $1, NULL);
+      }
+    | expressions EQ expressions
       {
           $$ = create_comparison(EQUAL_COMPARISON, $1, $3);
       }
@@ -551,40 +548,34 @@ comparison
       {
           $$ = create_comparison(GREATER_THAN_EQUAL_COMPARISON, NULL, $3);
       }
-    | expressions
-      {
-          $$ = create_comparison(NO_COMPARISON, $1, NULL);
-      }
     ;
 
 expressions
-    : expressions ',' expression
-      {
-          add_array_element($$, create_expression());
-      }
-    | expression
-      {
-          $$ = NULL;
-          add_array_element($$, create_expression());
-      }
+    :                 expression
+        {
+            $$ = NULL;
+            add_array_element($$, create_expression());
+        }
+    | expressions ',' expression
+        { add_array_element($$, create_expression()); }
     ;
 
 expression
-    : expression '+' term
+    :                term
+    | expression '+' term
     | expression '-' term
     | expression '|' term
     | expression '^' term
-    | term
     ;
 
 term
-    : term '*' value
+    :          value
+    | term '*' value
     | term '/' value
     | term '%' value
     | term '&' value
     | term LSH value
     | term RSH value
-    | value
     ;
 
 // TODO: ! * operators
