@@ -40,7 +40,7 @@ extern void compile_statements(Statement **);
     While_Statement *while_statement;
 }
 
-%token DDEFINE DELSE DEND DIF INCLUDE
+%token DDEFINE DELSE DEND DIF DINCLUDE
 %token CASE DEFAULT DEFER DO ELSE IF SWITCH WHILE
 %token BREAK CONTINUE FINISH RETURN
 %token ENUM FUNC PROC STRUCT UNION
@@ -97,7 +97,7 @@ translation_unit
     ;
 
 directive
-    : INCLUDE strings ';'
+    : DINCLUDE strings ';'
     ;
 
 strings
@@ -159,12 +159,43 @@ struct_item
 
 func_declaration
     : EXTERN       FUNC IDENTIFIER function_type_specifier ';'
-    |              FUNC IDENTIFIER function_type_specifier '{'
+    |              FUNC function_name function_type_specifier '{'
                        statements
                    '}'
       {
           compile_statements($5);
       }
+    ;
+
+function_name
+    : IDENTIFIER
+    | '*'
+    | '/'
+    | '&'
+    | LSH
+    | RSH
+    | '+'
+    | '-'
+    | '|'
+    | '^'
+    | EQ
+    | NEQ
+    | LTEQ
+    | GTEQ
+    | '<'
+    | '>'
+    | '[' ']'
+    ;
+
+function_type_specifier
+    : '(' parameters ')' fields type_specifier
+    | '(' parameters ')' fields
+    | '(' parameters ')'        type_specifier
+    | '(' parameters ')'
+    | '('            ')' fields type_specifier
+    | '('            ')' fields
+    | '('            ')'        type_specifier
+    | '('            ')'
     ;
 
 parameters
@@ -200,15 +231,6 @@ declaration
 typed_declaration
     : declarators type_specifier '=' expressions
     | declarators type_specifier
-    ;
-
-function_type_specifier
-    : '(' parameters ')' fields type_specifier
-    | '(' parameters ')'        type_specifier
-    | '(' parameters ')'
-    | '('            ')' fields type_specifier
-    | '('            ')'        type_specifier
-    | '('            ')'
     ;
 
 declarators

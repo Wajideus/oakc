@@ -41,8 +41,7 @@ STRING \"(\\.|[^\\"])*\"
 \#[ \t]*else    { update_position(); return DELSE; }
 \#[ \t]*end     { update_position(); return DEND; }
 \#[ \t]*if      { update_position(); return DIF; }
-
-include   { update_position(); return INCLUDE; }
+\#[ \t]*include { update_position(); return DINCLUDE; }
 
 Bool      { update_position(); return BOOL; }
 break     { update_position(); return BREAK; }
