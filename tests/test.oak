@@ -39,7 +39,8 @@ func main(args[] Str) Int {
 }
 
 
+
 // This is how you do operator overloading
-func + (v1 Vec3, v2 Vec3) Vec3 {
+func (v1 Vec3 + v2 Vec3) Vec3 {
    return (v1.x + v2.x, v1.y + v2.y, v1.z + v2.z);
 }

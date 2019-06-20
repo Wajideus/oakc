@@ -159,17 +159,26 @@ struct_item
 
 func_declaration
     : EXTERN       FUNC IDENTIFIER function_type_specifier ';'
-    |              FUNC function_name function_type_specifier '{'
+    |              FUNC IDENTIFIER function_type_specifier '{'
                        statements
                    '}'
       {
           compile_statements($5);
       }
+    |              FUNC infix_function_type_specifier '{'
+                       statements
+                   '}'
+      {
+          compile_statements($4);
+      }
     ;
 
-function_name
-    : IDENTIFIER
-    | '*'
+infix_function_type_specifier
+    : '(' infix_operand infix_operator infix_operand ')' function_return_type
+    ;
+
+infix_operator
+    : '*'
     | '/'
     | '&'
     | LSH
@@ -184,18 +193,22 @@ function_name
     | GTEQ
     | '<'
     | '>'
-    | '[' ']'
+    ;
+
+infix_operand
+    : declarator type_specifier
     ;
 
 function_type_specifier
-    : '(' parameters ')' fields type_specifier
-    | '(' parameters ')' fields
-    | '(' parameters ')'        type_specifier
-    | '(' parameters ')'
-    | '('            ')' fields type_specifier
-    | '('            ')' fields
-    | '('            ')'        type_specifier
-    | '('            ')'
+    : '(' parameters ')' function_return_type
+    | '('            ')' function_return_type
+    ;
+
+function_return_type
+    : fields type_specifier
+    | fields 
+    |        type_specifier
+    | /* empty */
     ;
 
 parameters
