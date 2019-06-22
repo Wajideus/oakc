@@ -43,3 +43,12 @@ func main(args[] Str) Int {
 func (v1 Vec3 + v2 Vec3) Vec3 {
    return (v1.x + v2.x, v1.y + v2.y, v1.z + v2.z);
 }
+
+// This is using generics with explicit typing.
+func sum<$T>(x T, y T) T;
+
+// This is using type specialization with explicit typing.
+func sum<Int>(x Int, y Int) Int;
+
+// This is using generics with implicit typing.
+func sum(x $T, y T) T;

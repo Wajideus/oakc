@@ -254,10 +254,10 @@
 		{
 			"name": "String Escapes",
 			"scope": [
-				"constant.character.escape"
+				"constant.character.escape",
+				"constant.other.placeholder"
 			],
 			"settings": {
-				"fontStyle": "bold",
 				"foreground": "#C4A000"
 			}
 		},

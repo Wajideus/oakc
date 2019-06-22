@@ -28,10 +28,17 @@ color brightwhite "\<([A-Z][0-9A-Z_a-z]*)\>"
 # Modifiers.
 color brightblue "\<(extern|mixin)\>"
 
+# Generics.
+color brightyellow "<[^[:blank:]=]*>"
+
+# Wildcards.
+color yellow "\$[A-Z_a-z][0-9A-Z_a-z]*"
+
 # String Literals.
 #color brightyellow ""([^"]|\\")*"" "'[^']'"
 color brightyellow ""([^"]|\\")*"" "'([^']|\\')*'"
 color brightyellow start="\"\"\"" end="\"\"\""
+
 
 # Comments.
 color brightgreen "//.*"
