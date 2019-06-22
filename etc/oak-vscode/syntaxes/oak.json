@@ -9,9 +9,8 @@
     	{"include": "#control-keywords"},
     	{"include": "#branch-keywords"},
     	{"include": "#operator-keywords"},
-    	{"include": "#builtin-constants"},
-    	{"include": "#regular-constants"},
-    	{"include": "#regular-typenames"},
+    	{"include": "#constants"},
+    	{"include": "#typenames"},
     	{"include": "#modifiers"},
 		{"include": "#strings"},
 		{"include": "#comments"}
@@ -26,11 +25,11 @@
 			}
 		},
      	"declaration-keywords": {
-			"match": "\\b(enum|func|struct|union)\\b",
+			"match": "\\b(enum|func|struct|typedef|union|var)\\b",
         	"name": "storage.type.oak"
 		},
       	"control-keywords": {
-        	"match": "\\b(case|default|defer|do|else|for|if|switch|while)\\b",
+			"match": "\\b(assert|case|default|defer|do|else|for|if|switch|while)\\b",
         	"name": "keyword.control.oak"
     	},
     	"branch-keywords": {
@@ -41,20 +40,16 @@
         	"match": "\\b(lengthOf|offsetOf|sizeOf)\\b",
         	"name": "keyword.operator.sizeof.oak"
     	},
-	  	"builtin-constants": {
-        	"match": "\\b(FALSE|TRUE|NULL)\\b",
-        	"name": "constant.language.oak"
-    	},
-		"regular-constants": {
+		"constants": {
 			"match": "\\b([A-Z][0-9A-Z_]+)\\b",
 			"name": "regular_constant.oak"
 		},
-      	"regular-typenames": {
+      	"typenames": {
         	"match": "\\b([A-Z][0-9A-Z_a-z]*)\\b",
         	"name": "entity.name.type.oak"
       	},
       	"modifiers": {
-        	"match": "\\b(extern|mixin|typedef|var)\\b",
+        	"match": "\\b(extern|mixin)\\b",
         	"name": "storage.modifier.oak"
 		},
 		"strings": {

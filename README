@@ -82,7 +82,7 @@ the C programming language.
 
 10. Multiple comma-separated includes can by done at once.
 
-        include "stdio", "stdlib";
+        #include "stdio", "stdlib";
 
     This just saves some typing.
 

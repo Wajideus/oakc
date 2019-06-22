@@ -6,21 +6,27 @@ comment "//"
 color brightcyan "\#[ \t]*\<(define|else|end|if)\>"
 color brightcyan "\<(include)\>"
 
-# Keywords.
-color brightblue "\<(case|default|defer|do|else|for|if|switch|while)\>"
+# Control Keywords.
+color brightblue "\<(assert|case|default|defer|do|else|for|if|switch|while)\>"
 color brightblue "\<((for)?each|in)\>"
+
+# Branch Keywords.
 color brightmagenta "\<(break|continue|finish|goto|return)\>"
 
-# Type Declarations.
-color brightwhite "\<([A-Z_a-z][0-9A-Z_a-z]*)\>"
-color brightblue "\<(enum|func|struct|union)\>"
-color brightblue "\<(extern|mixin|typedef|var)\>"
+# Declaration Keywords.
+color brightblue "\<(enum|func|struct|typedef|union|var)\>"
+
+# Operator Keywords.
+color white "\<(lengthOf|sizeOf|typeOf)\>"
 
 # Constants.
-#color white "\<[A-Z][0-9A-Z_]+\>"
-color white "\<(FALSE|TRUE|NULL)\>"
-color white "\<[A-Za-z][0-9A-Z_a-z]*\>!"
-color white "\<(lengthOf|sizeOf|typeOf)\>"
+color white "\<[A-Z][0-9A-Z_]+\>"
+
+# Typenames.
+color brightwhite "\<([A-Z][0-9A-Z_a-z]*)\>"
+
+# Modifiers.
+color brightblue "\<(extern|mixin)\>"
 
 # String Literals.
 #color brightyellow ""([^"]|\\")*"" "'[^']'"

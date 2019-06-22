@@ -41,16 +41,14 @@ extern void compile_statements(Statement **);
 }
 
 %token DDEFINE DELSE DEND DIF DINCLUDE
-%token CASE DEFAULT DEFER DO ELSE IF SWITCH WHILE
+%token ASSERT CASE DEFAULT DEFER DO ELSE IF SWITCH WHILE
 %token BREAK CONTINUE FINISH RETURN
 %token ENUM FUNC PROC STRUCT UNION
-%token BOOL CHAR DICT FLOAT INT SIZE STR TYPE UINT VOID
 %token CONST EXTERN MIXIN TYPEDEF VAR
 %token <identifier> IDENTIFIER
 %token NUMBER
 %token STRING
-%token KFALSE KNULL KTRUE
-%token LENGTHOF NUMBEROF SIZEOF
+%token LENGTHOF SIZEOF
 %token LSH RSH
 %token LTEQ GTEQ EQ NEQ
 %token AND OR
@@ -68,6 +66,7 @@ extern void compile_statements(Statement **);
 %type <comparison> comparison
 %type <statement> statement
 
+%type <statement> assert_statement
 %type <break_statement> break_statement
 %type <call_statement> call_statement
 %type <statements> compound_statement
@@ -125,13 +124,13 @@ enum_declaration
 
 enum_items
     :                enum_item
-    | enum_items ',' enum_item
     | enum_items ','
+    | enum_items ',' enum_item
     ;
 
 enum_item
-    : IDENTIFIER '=' expression
-    | IDENTIFIER
+    : IDENTIFIER
+    | IDENTIFIER '=' expression
     ;
 
 anonymous_struct
@@ -215,8 +214,8 @@ parameters
     ;
 
 parameter
-    : unmodified_parameter
-    | ETC
+    : ETC
+    | unmodified_parameter
     ;
 
 unmodified_parameter
@@ -267,23 +266,8 @@ subscript
     ;
 
 type_specifier
-    :             direct_type_specifier
-    | indirection direct_type_specifier
-    ;
-
-direct_type_specifier
-    : IDENTIFIER
-    | BOOL
-    | CHAR
-    | DICT
-    | FLOAT
-    | INT
-    | PROC
-    | SIZE
-    | STR
-    | TYPE
-    | UINT
-    | VOID
+    :             IDENTIFIER
+    | indirection IDENTIFIER
     ;
 
 indirection
@@ -304,7 +288,8 @@ statements
     ;
 
 statement
-    : break_statement
+    : assert_statement
+    | break_statement
         { $$ = as_statement($1); }
     | call_statement
         { $$ = as_statement($1); }
@@ -330,6 +315,11 @@ statement
         { $$ = as_statement($1); }
     | while_statement
         { $$ = as_statement($1); }
+    ;
+
+assert_statement
+    : ASSERT expression ';'
+        { $$ = NULL; }
     ;
 
 break_statement
@@ -402,9 +392,9 @@ finish_statement
     ;
 
 if_statement
-    : IF conditions compound_statement ELSE compound_statement
+    : IF conditions compound_statement
         { $$ = create_if_statement($2, $3); }
-    | IF conditions compound_statement
+    | IF conditions compound_statement ELSE compound_statement
         { $$ = create_if_statement($2, $3); }
     ;
 
@@ -582,7 +572,6 @@ term
 
 value
     : LENGTHOF '(' reference ')'
-    | NUMBEROF '(' reference ')'
     | SIZEOF   '(' reference ')'
     | value    '(' arguments ')'
     | value    '(' ')'
@@ -592,9 +581,6 @@ value
     | IDENTIFIER
     | NUMBER
     | STRING
-    | KFALSE
-    | KTRUE
-    | KNULL
     ;
 
 %%

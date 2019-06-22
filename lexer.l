@@ -43,41 +43,28 @@ STRING \"(\\.|[^\\"])*\"
 \#[ \t]*if      { update_position(); return DIF; }
 \#[ \t]*include { update_position(); return DINCLUDE; }
 
-Bool      { update_position(); return BOOL; }
+assert    { update_position(); return ASSERT; }
 break     { update_position(); return BREAK; }
 case      { update_position(); return CASE; }
-Char      { update_position(); return CHAR; }
 Const     { update_position(); return CONST; }
 continue  { update_position(); return CONTINUE; }
 default   { update_position(); return DEFAULT; }
 defer     { update_position(); return DEFER; }
 do        { update_position(); return DO; }
-Dict      { update_position(); return DICT; }
 else      { update_position(); return ELSE; }
 enum      { update_position(); return ENUM; }
 extern    { update_position(); return EXTERN; }
-FALSE     { update_position(); return KFALSE; }
 finish    { update_position(); return FINISH; }
-Float     { update_position(); return FLOAT; }
 func      { update_position(); return FUNC; }
 if        { update_position(); return IF; }
-Int       { update_position(); return INT; }
 lengthOf  { update_position(); return LENGTHOF; }
 mixin     { update_position(); return MIXIN; }
-NULL      { update_position(); return KNULL; }
-Proc      { update_position(); return PROC; }
 return    { update_position(); return RETURN; }
-Size      { update_position(); return SIZE; }
 sizeOf    { update_position(); return SIZEOF; }
-Str       { update_position(); return STR; }
 struct    { update_position(); return STRUCT; }
 switch    { update_position(); return SWITCH; }
-TRUE      { update_position(); return KTRUE; }
-Type      { update_position(); return TYPE; }
 typedef   { update_position(); return TYPEDEF; }
-UInt      { update_position(); return UINT; }
 var       { update_position(); return VAR; }
-Void      { update_position(); return VOID; }
 while     { update_position(); return WHILE; }
 {IDENTIFIER}  {
     // todo: check if type or identifier
