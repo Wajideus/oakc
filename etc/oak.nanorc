@@ -7,17 +7,14 @@ color brightcyan "\#[ \t]*\<(define|else|end|if)\>"
 color brightcyan "\<(include)\>"
 
 # Control Keywords.
-color brightblue "\<(assert|case|default|defer|do|else|for|if|switch|while)\>"
+color brightblue "\<(assert|case|default|defer|do|else|end|for|if|switch|while)\>"
 color brightblue "\<((for)?each|in)\>"
 
 # Branch Keywords.
-color brightmagenta "\<(break|continue|finish|goto|return)\>"
+color brightmagenta "\<(break|continue|finish|goto|next|return)\>"
 
 # Declaration Keywords.
 color brightblue "\<(enum|func|struct|typedef|union|var)\>"
-
-# Operator Keywords.
-color white "\<(lengthOf|sizeOf|typeOf)\>"
 
 # Constants.
 color white "\<[A-Z][0-9A-Z_]+\>"
@@ -26,7 +23,7 @@ color white "\<[A-Z][0-9A-Z_]+\>"
 color brightwhite "\<([A-Z][0-9A-Z_a-z]*)\>"
 
 # Modifiers.
-color brightblue "\<(extern|mixin)\>"
+color brightblue "\<(extern|inline|mixin|static)\>"
 
 # Generics.
 color brightyellow "<[^[:blank:]=]*>"

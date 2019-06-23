@@ -41,14 +41,14 @@ extern void compile_statements(Statement **);
 }
 
 %token DDEFINE DELSE DEND DIF DINCLUDE
-%token ASSERT CASE DEFAULT DEFER DO ELSE IF SWITCH WHILE
-%token BREAK CONTINUE FINISH RETURN
-%token ENUM FUNC PROC STRUCT UNION
-%token CONST EXTERN MIXIN TYPEDEF VAR
+%token ASSERT CASE DEFAULT DEFER DO ELSE END IF SWITCH WHILE
+%token BREAK CONTINUE FINISH NEXT RETURN
+%token ENUM FUNC STRUCT TYPEDEF UNION VAR
+%token CONST EXTERN INLINE MIXIN STATIC
 %token <identifier> IDENTIFIER
 %token NUMBER
 %token STRING
-%token LENGTHOF SIZEOF
+%token NEWLINE INDENT DEDENT
 %token LSH RSH
 %token LTEQ GTEQ EQ NEQ
 %token AND OR
@@ -571,9 +571,7 @@ term
 // TODO: ! * operators
 
 value
-    : LENGTHOF '(' reference ')'
-    | SIZEOF   '(' reference ')'
-    | value    '(' arguments ')'
+    : value    '(' arguments ')'
     | value    '(' ')'
     | value    '[' expression ']'
     | value '.' IDENTIFIER

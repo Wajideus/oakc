@@ -19,7 +19,7 @@
    ],
    "repository": {
 		"directive-keywords": {
-			"match": "(^#)[ \t]*\\b(define|include)\\b",
+			"match": "(^%)[ \t]*\\b(define|include)\\b",
 			"captures": {
 				"2": {
 					"name": "meta.preprocessor.keyword"
@@ -31,11 +31,11 @@
         	"name": "storage.type.oak"
 		},
       	"control-keywords": {
-			"match": "\\b(assert|case|default|defer|do|else|for|if|switch|while)\\b",
+			"match": "\\b(assert|case|default|defer|do|else|end|for|if|in|switch|while)\\b",
         	"name": "keyword.control.oak"
     	},
     	"branch-keywords": {
-        	"match": "\\b(break|continue|finish|goto|return)\\b",
+        	"match": "\\b(break|continue|finish|goto|next|return)\\b",
         	"name": "keyword.control.branch.oak"
     	},
     	"operator-keywords": {
@@ -51,7 +51,7 @@
         	"name": "entity.name.type.oak"
       	},
       	"modifiers": {
-        	"match": "\\b(extern|mixin)\\b",
+        	"match": "\\b(extern|inline|mixin|static)\\b",
         	"name": "storage.modifier.oak"
 		},
 		"generics": {
@@ -77,6 +77,9 @@
 					},
 					"name": "string.quoted.double",
 					"patterns": [
+						{
+							"include": "#generics"
+						},
 						{
 							"include": "#wildcards"
 						}
@@ -213,11 +216,11 @@
 							"name": "meta.toc-list.banner.line"
 						}
 					},
-					"match": "^// =(\\s*.*?)\\s*=\\s*$\\n?",
+					"match": "^(//|#) =(\\s*.*?)\\s*=\\s*$\\n?",
 					"name": "comment.line.banner.cpp"
 				},
 				{
-					"begin": "(^[ \\t]+)?(?=//)",
+					"begin": "(^[ \\t]+)?(?=(//|#))",
 					"beginCaptures": {
 						"1": {
 							"name": "punctuation.whitespace.comment.leading"
@@ -226,7 +229,7 @@
 					"end": "(?!\\G)",
 					"patterns": [
 						{
-							"begin": "//",
+							"begin": "//|#",
 							"beginCaptures": {
 								"0": {
 									"name": "punctuation.definition.comment"
