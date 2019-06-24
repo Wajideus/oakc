@@ -3,15 +3,13 @@ magic "^(Oak) (source|program)"
 comment "//"
 
 # Directives.
-color brightcyan "\#[ \t]*\<(define|else|end|if)\>"
-color brightcyan "\<(include)\>"
+color brightcyan "\#[ \t]*\<(include)\>"
 
 # Control Keywords.
-color brightblue "\<(assert|case|default|defer|do|else|end|for|if|switch|while)\>"
-color brightblue "\<((for)?each|in)\>"
+color brightblue "\<(assert|case|default|defer|do|else|for|if|in|switch|while)\>"
 
 # Branch Keywords.
-color brightmagenta "\<(break|continue|finish|goto|next|return)\>"
+color brightmagenta "\<(break|continue|goto|return)\>"
 
 # Declaration Keywords.
 color brightblue "\<(enum|func|struct|typedef|union|var)\>"

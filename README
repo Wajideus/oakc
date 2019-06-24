@@ -177,21 +177,7 @@ the C programming language.
     to prevent them from being reassigned and make them easily greppable.
 
 
-26. There's a "Proc" (process) type for coroutines.
-
-        func dostuff() Proc {
-            ...
-        }
-
-        func main(args[] Str) Int {
-            var doingstuff Proc = dostuff();
-            while doingstuff {
-                ...
-            }
-        }
-
-
-27. A cast from "() T" to "T" is done implicitly via function call.
+26. A cast from "() T" to "T" is done implicitly via function call.
 
         func text() Str {
             return "Hello World!";

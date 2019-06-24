@@ -69,10 +69,6 @@ typedef struct {
 } Define_Statement;
 
 typedef struct {
-    const char *identifier;
-} Finish_Statement;
-
-typedef struct {
     Condition **conditions;
     Statement **then_statements;
 } If_Statement;
@@ -99,7 +95,6 @@ typedef enum {
     DECLARE_STATEMENT,
     DEFER_STATEMENT,
     DEFINE_STATEMENT,
-    FINISH_STATEMENT,
     IF_STATEMENT,
     RETURN_STATEMENT,
     SET_STATEMENT,
@@ -116,7 +111,6 @@ struct Statement {
         Declare_Statement declare_statement;
         Defer_Statement defer_statement;
         Define_Statement define_statement;
-        Finish_Statement finish_statement;
         If_Statement if_statement;
         Return_Statement return_statement;
         Set_Statement set_statement;
@@ -154,9 +148,6 @@ create_defer_statement(void);
 
 Define_Statement *
 create_define_statement(void);
-
-Finish_Statement *
-create_finish_statement(const char *identifier);
 
 If_Statement *
 create_if_statement(Condition **conditions,

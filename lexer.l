@@ -37,10 +37,6 @@ STRING \"(\\.|[^\\"])*\"
     last_token_length = 0;
 }
 
-\#[ \t]*define  { update_position(); return DDEFINE; }
-\#[ \t]*else    { update_position(); return DELSE; }
-\#[ \t]*end     { update_position(); return DEND; }
-\#[ \t]*if      { update_position(); return DIF; }
 \#[ \t]*include { update_position(); return DINCLUDE; }
 
 assert    { update_position(); return ASSERT; }
@@ -52,15 +48,12 @@ default   { update_position(); return DEFAULT; }
 defer     { update_position(); return DEFER; }
 do        { update_position(); return DO; }
 else      { update_position(); return ELSE; }
-end       { update_position(); return END; }
 enum      { update_position(); return ENUM; }
 extern    { update_position(); return EXTERN; }
-finish    { update_position(); return FINISH; }
 func      { update_position(); return FUNC; }
 if        { update_position(); return IF; }
 inline    { update_position(); return INLINE; }
 mixin     { update_position(); return MIXIN; }
-next      { update_position(); return NEXT; }
 return    { update_position(); return RETURN; }
 static    { update_position(); return STATIC; }
 struct    { update_position(); return STRUCT; }

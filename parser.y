@@ -32,7 +32,6 @@ extern void compile_statements(Statement **);
     Declare_Statement *declare_statement;
     Defer_Statement *defer_statement;
     Define_Statement *define_statement;
-    Finish_Statement *finish_statement;
     If_Statement *if_statement;
     Return_Statement *return_statement;
     Set_Statement *set_statement;
@@ -40,15 +39,14 @@ extern void compile_statements(Statement **);
     While_Statement *while_statement;
 }
 
-%token DDEFINE DELSE DEND DIF DINCLUDE
-%token ASSERT CASE DEFAULT DEFER DO ELSE END IF SWITCH WHILE
-%token BREAK CONTINUE FINISH NEXT RETURN
+%token DINCLUDE
+%token ASSERT CASE DEFAULT DEFER DO ELSE IF SWITCH WHILE
+%token BREAK CONTINUE RETURN
 %token ENUM FUNC STRUCT TYPEDEF UNION VAR
 %token CONST EXTERN INLINE MIXIN STATIC
 %token <identifier> IDENTIFIER
 %token NUMBER
 %token STRING
-%token NEWLINE INDENT DEDENT
 %token LSH RSH
 %token LTEQ GTEQ EQ NEQ
 %token AND OR
@@ -74,7 +72,6 @@ extern void compile_statements(Statement **);
 %type <declare_statement> declare_statement
 %type <defer_statement> defer_statement
 %type <define_statement> define_statement
-%type <finish_statement> finish_statement
 %type <if_statement> if_statement
 %type <return_statement> return_statement
 %type <set_statement> set_statement
@@ -303,8 +300,6 @@ statement
         { $$ = as_statement($1); }
     | define_statement
         { $$ = as_statement($1); }
-    | finish_statement
-        { $$ = as_statement($1); }
     | if_statement
         { $$ = as_statement($1); }
     | return_statement
@@ -384,11 +379,6 @@ define_statement
         { $$ = create_define_statement(); }
     | type_definition
         { $$ = create_define_statement(); }
-    ;
-
-finish_statement
-    : FINISH references ';'
-        { $$ = create_finish_statement(NULL); }
     ;
 
 if_statement
